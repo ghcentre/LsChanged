@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LsChanged": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\ C:\\TEMP\\files.json"
+    }
+  }
+}
