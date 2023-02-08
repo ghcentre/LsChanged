@@ -3,6 +3,10 @@
     "LsChanged": {
       "commandName": "Project",
       "commandLineArgs": "C:\\ C:\\TEMP\\files.json"
+    },
+    "Linux (WSL)": {
+      "commandName": "WSL2",
+      "commandLineArgs": "{OutDir}/LsChanged.dll \"/mnt/c/Documents and Settings\" /mnt/c/TEMP/files-wsl.json"
     }
   }
 }
