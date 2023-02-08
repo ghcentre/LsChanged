@@ -1,9 +1,13 @@
 ﻿using LsChanged.Settings;
+using System.Diagnostics;
 
 namespace LsChanged;
 
 internal class FileInfoCollector
 {
+    private readonly Dictionary<string, FileStatus> _files = new();
+    private readonly HashSet<string> _visitedDirectories = new();
+
     private readonly FileInfoCollectorSettings _settings;
 
     public FileInfoCollector(FileInfoCollectorSettings settings)
@@ -12,86 +16,160 @@ internal class FileInfoCollector
         _settings = settings;
     }
 
-
-    public IReadOnlyDictionary<string, FileInformation> Collect(string path)
+    public IReadOnlyDictionary<string, FileStatus> Collect(string path)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
 
-        var result = new Dictionary<string, FileInformation>();
+        _files.Clear();
+        _visitedDirectories.Clear();
 
-        string[] filePaths;
-        try
+        CollectRecursive(path);
+
+        return _files.AsReadOnly();
+    }
+
+
+    private void CollectRecursive(string path)
+    {
+        CollectFiles(path);
+
+        var directories = GetDirectories(path);
+
+        foreach (string directoryPath in directories)
         {
-            filePaths = Directory.GetFiles(path);
+            if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.Follow)
+            {
+                LogAndCollectRecursive(directoryPath);
+                continue;
+            }
+
+            string? linkTarget = ResolveLinkTarget(directoryPath);
+
+            if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.SkipAll)
+            {
+                if (linkTarget == null)
+                {
+                    LogAndCollectRecursive(directoryPath);
+                }
+
+                continue;
+            }
+
+            Debug.Assert(_settings.FollowSymlinkSettings == FollowSymlinkSettings.SkipRecirsive);
+
+            string checkee = linkTarget ?? directoryPath;
+            if (_visitedDirectories.Contains(checkee))
+            {
+                continue;
+            }
+
+            _visitedDirectories.Add(checkee);
+
+            LogAndCollectRecursive(directoryPath);
         }
-        catch (UnauthorizedAccessException)
-        {
-            return result.AsReadOnly();
-        }
-        catch(DirectoryNotFoundException)
-        {
-            return result.AsReadOnly();
-        }
+    }
+
+
+    #region Files
+
+    private void CollectFiles(string path)
+    {
+        var filePaths = GetFiles(path);
 
         foreach (string filePath in filePaths)
         {
-            FileInfo? fileInfo;
-            FileInformation? fileInformation;
-            try
-            {
-                fileInfo = new FileInfo(filePath);
-                fileInformation = new FileInformation(fileInfo.Length,
-                                                      fileInfo.LastWriteTimeUtc,
-                                                      (int)fileInfo.Attributes,
-                                                      (int)fileInfo.UnixFileMode);
-                Console.WriteLine(filePath);
-            }
-            catch (FileNotFoundException)
-            {
-                continue;
-            }
-            result.TryAdd(filePath, fileInformation);
-        }
-
-
-        string[] directories = Directory.GetDirectories(path);
-        foreach (string directoryPath in directories)
-        {
-            var dirInfo = new DirectoryInfo(directoryPath);
-            if (!FollowDirectory(dirInfo))
+            var status = CreateFileStatus(filePath);
+            if (status == null)
             {
                 continue;
             }
 
-            var fileEntries = Collect(directoryPath);
-            foreach (var entry in fileEntries)
-            {
-                result.TryAdd(entry.Key, entry.Value);
-            }
+            _files.TryAdd(filePath, status);
         }
-
-        return result.AsReadOnly();
     }
 
-    private bool FollowDirectory(DirectoryInfo info)
+    private static IEnumerable<string> GetFiles(string path)
     {
-        if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.Follow)
+        try
         {
-            return true;
+            string[] result = Directory.GetFiles(path);
+            return result;
         }
-
-        string? linkTarget = info.LinkTarget;
-        if (linkTarget == null)
+        catch (UnauthorizedAccessException)
         {
-            return true;
+            return Enumerable.Empty<string>();
         }
-
-        if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.SkipAll)
+        catch (DirectoryNotFoundException)
         {
-            return false;
+            return Enumerable.Empty<string>();
         }
-
-        bool isRecursive = info.FullName.StartsWith(linkTarget, StringComparison.OrdinalIgnoreCase);
-        return !isRecursive;
     }
+
+    private static FileStatus? CreateFileStatus(string filePath)
+    {
+        try
+        {
+            var fileInfo = new FileInfo(filePath);
+
+            var status = new FileStatus(
+                fileInfo.Length,
+                fileInfo.LastWriteTimeUtc,
+                (int)fileInfo.Attributes,
+                (int)fileInfo.UnixFileMode);
+
+            return status;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return null;
+        }
+        catch (FileNotFoundException)
+        {
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region Directories
+
+    private static IEnumerable<string> GetDirectories(string path)
+    {
+        try
+        {
+            string[] result = Directory.GetDirectories(path);
+            return result;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Enumerable.Empty<string>();
+        }
+        catch(DirectoryNotFoundException)
+        {
+            return Enumerable.Empty<string>();
+        }
+    }
+
+    private void LogAndCollectRecursive(string directoryPath)
+    {
+        Console.WriteLine(directoryPath);
+        CollectRecursive(directoryPath);
+    }
+
+    private static string? ResolveLinkTarget(string directoryPath)
+    {
+        try
+        {
+            var link = Directory.ResolveLinkTarget(directoryPath, true) as DirectoryInfo;
+
+            string? result = link?.FullName;
+            return result;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return null;
+        }
+    }
+
+    #endregion
 }

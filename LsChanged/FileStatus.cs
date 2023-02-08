@@ -1,17 +1,17 @@
 ﻿namespace LsChanged;
 
-internal class FileInformation
+internal class FileStatus
 {
-    public FileInformation(long size, DateTimeOffset lastWrite, int attributes, int mode)
+    public FileStatus(long size, DateTime lastWriteUtc, int attributes, int mode)
     {
         Size = size;
-        LastWrite = lastWrite;
+        LastWriteUtc = lastWriteUtc;
         Attributes = attributes;
         Mode = mode;
     }
 
     public long Size { get; }
-    public DateTimeOffset LastWrite { get; }
+    public DateTime LastWriteUtc { get; }
     public int Attributes { get; }
     public int Mode { get; }
 }

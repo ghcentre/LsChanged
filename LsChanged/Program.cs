@@ -19,7 +19,7 @@ internal class Program
             string startingPath = GetStartingPath(args);
             string saveFile = GetSaveFile(args);
 
-            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinkSettings.SkipRecirsive);
+            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinkSettings.SkipAll);
             var collector = new FileInfoCollector(collectorSettings);
             var entries = collector.Collect(startingPath);
 
