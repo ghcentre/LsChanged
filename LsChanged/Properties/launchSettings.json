@@ -2,11 +2,11 @@
   "profiles": {
     "LsChanged": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\_test C:\\TEMP\\files.json"
+      "commandLineArgs": "C:\\ C:\\TEMP\\LsChangedStore"
     },
     "Linux (WSL)": {
       "commandName": "WSL2",
-      "commandLineArgs": "{OutDir}/LsChanged.dll \"/mnt/c/\" /mnt/c/TEMP/files-wsl.json"
+      "commandLineArgs": "{OutDir}/LsChanged.dll /proc /mnt/c/TEMP/files-wsl.json"
     }
   }
 }

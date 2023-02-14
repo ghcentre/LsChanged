@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace LsChanged;
 
-internal class FileInfoCollector
+internal sealed class FileInfoCollector
 {
     private readonly Dictionary<string, FileStatus> _files = new();
     private readonly HashSet<string> _visitedDirectories = new();
@@ -37,7 +37,7 @@ internal class FileInfoCollector
 
         foreach (string directoryPath in directories)
         {
-            if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.Follow)
+            if (_settings.FollowSymlinks == FollowSymlinksMode.Follow)
             {
                 LogAndCollectRecursive(directoryPath);
                 continue;
@@ -45,7 +45,7 @@ internal class FileInfoCollector
 
             string? linkTarget = ResolveLinkTarget(directoryPath);
 
-            if (_settings.FollowSymlinkSettings == FollowSymlinkSettings.SkipAll)
+            if (_settings.FollowSymlinks == FollowSymlinksMode.Skip)
             {
                 if (linkTarget == null)
                 {
@@ -55,7 +55,7 @@ internal class FileInfoCollector
                 continue;
             }
 
-            Debug.Assert(_settings.FollowSymlinkSettings == FollowSymlinkSettings.SkipRecirsive);
+            Debug.Assert(_settings.FollowSymlinks == FollowSymlinksMode.PreventRecursion);
 
             string checkee = linkTarget ?? directoryPath;
             if (_visitedDirectories.Contains(checkee))

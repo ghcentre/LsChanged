@@ -1,6 +1,6 @@
 ﻿namespace LsChanged;
 
-internal class FatalExitException : Exception
+internal sealed class FatalExitException : Exception
 {
     public FatalExitException(string message, int exitCode)
         : base(message)

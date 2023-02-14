@@ -1,12 +1,12 @@
 ﻿namespace LsChanged.Settings;
 
-internal class FileInfoCollectorSettings
+internal sealed class FileInfoCollectorSettings
 {
-    public FileInfoCollectorSettings(FollowSymlinkSettings followSymlinkSettings)
+    public FileInfoCollectorSettings(FollowSymlinksMode followSymlinks)
     {
-        FollowSymlinkSettings = followSymlinkSettings;
+        FollowSymlinks = followSymlinks;
     }
 
 
-    public FollowSymlinkSettings FollowSymlinkSettings { get; }
+    public FollowSymlinksMode FollowSymlinks { get; }
 }

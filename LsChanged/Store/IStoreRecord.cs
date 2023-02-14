@@ -1,0 +1,10 @@
+﻿namespace LsChanged.Store;
+
+internal interface IStoreRecord
+{
+    int Version { get; }
+
+    DateTime CreatedAtUtc { get; }
+
+    IReadOnlyDictionary<string, FileStatus> Files { get; }
+}

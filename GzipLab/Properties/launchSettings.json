@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GzipLab": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\TEMP\\files.json"
+    }
+  }
+}

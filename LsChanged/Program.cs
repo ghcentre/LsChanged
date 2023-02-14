@@ -1,11 +1,12 @@
 ﻿using LsChanged.Settings;
+using LsChanged.Store;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 
 namespace LsChanged;
 
-internal class Program
+internal static class Program
 {
     private static int Main(string[] args)
     {
@@ -13,23 +14,31 @@ internal class Program
         {
             if (args.Length < 2)
             {
-                throw new FatalExitException("Usage: lschanged path outfile.json", ExitCode.InvalidCommandLineArg);
+                throw new FatalExitException("Usage: lschanged path store", ExitCode.InvalidCommandLineArg);
             }
 
             string startingPath = GetStartingPath(args);
-            string saveFile = GetSaveFile(args);
+            string storePath = GetStorePath(args);
 
-            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinkSettings.SkipAll);
+            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinksMode.PreventRecursion);
             var collector = new FileInfoCollector(collectorSettings);
+            
             var entries = collector.Collect(startingPath);
 
-            var options = new JsonSerializerOptions()
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
-            string content = JsonSerializer.Serialize(entries, options);
-            File.WriteAllText(saveFile, content);
+            var deserializer = new StoreRecordDeserializer();
+            var reader = new StoreRecordReader(deserializer);
+
+            var serializer = new StoreRecordSerializer();
+            var writer = new StoreRecordWriter(serializer);
+
+            var ctp = new CurrentTimeProvider();
+
+            var store = new Store.Store(storePath, ctp, reader, writer);
+
+            var storeRecordFactory = new StoreRecordFactory();
+            var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
+
+            store.Add(storeRecord);
 
             return ExitCode.Success;
         }
@@ -56,24 +65,13 @@ internal class Program
         return result;
     }
 
-    private static string GetSaveFile(string[] args)
+    private static string GetStorePath(string[] args)
     {
         string? result = args[1];
         if (string.IsNullOrEmpty(result))
         {
-            throw new FatalExitException("Save file path is empty.", ExitCode.InvalidPathSpecified);
+            throw new FatalExitException("Store is empty.", ExitCode.InvalidPathSpecified);
         }
-
-        try
-        {
-            string content = Guid.NewGuid().ToString();
-            File.WriteAllText(result, content);
-        }
-        catch (Exception exception)
-        {
-            throw new FatalExitException($"Could not write to file: {exception.Message}", ExitCode.WriteError, exception);
-        }
-
         return result;
     }
 }
