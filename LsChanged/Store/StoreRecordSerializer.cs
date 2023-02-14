@@ -1,4 +1,5 @@
 ﻿using LsChanged.Exceptions;
+using LsChanged.Store.Abstractions;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;

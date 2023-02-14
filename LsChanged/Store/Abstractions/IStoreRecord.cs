@@ -1,4 +1,4 @@
-﻿namespace LsChanged.Store;
+﻿namespace LsChanged.Store.Abstractions;
 
 internal interface IStoreRecord
 {

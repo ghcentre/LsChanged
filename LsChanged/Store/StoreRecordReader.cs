@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Text;
+using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 

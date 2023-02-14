@@ -1,4 +1,5 @@
 ﻿using LsChanged.Exceptions;
+using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 
