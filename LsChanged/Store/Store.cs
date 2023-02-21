@@ -5,6 +5,8 @@ namespace LsChanged.Store;
 
 internal class Store : IStore
 {
+    private const string _markerFileName = ".lschanged.store.marker";
+
     private static readonly Func<string, IStoreEntry> _storeEntryFactory = x => new StoreEntry(x);
 
     private readonly string _pathToStore;
@@ -29,6 +31,34 @@ internal class Store : IStore
 
         ArgumentNullException.ThrowIfNull(writer);
         _writer = writer;
+
+        InitializeStore();
+    }
+
+    private void InitializeStore()
+    {
+        string markerFilePath = Path.Combine(_pathToStore, _markerFileName);
+
+        try
+        {
+            if (File.Exists(markerFilePath))
+            {
+                byte[] bytes = File.ReadAllBytes(markerFilePath);
+                if (bytes == null || bytes.Length > 0)
+                {
+                    throw new InvalidOperationException("Invalid store marker file.");
+                }
+
+                return;
+            }
+
+            File.WriteAllBytes(markerFilePath, Array.Empty<byte>());
+        }
+        catch (Exception exception)
+        {
+            throw new StoreInaccessibleException(exception);
+        }
+        
     }
 
     public IEnumerable<IStoreEntry> ListAll()
