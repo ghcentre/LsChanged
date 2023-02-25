@@ -1,0 +1,92 @@
+﻿Usage: lschanged command [args] [options] 
+
+Common options:
+    -s path     Sets store path. The path must be absolute path.
+
+    -v          Outputs actions perfomed to the standard output
+                (verbose mode). Error output is always directed to
+                the standard error stream.
+
+Commands:
+    scan        Scans the folder specified and adds generated snaphot
+                to the store.
+
+                Arguments:
+                    folder      The folder to scan. Must be absolute
+                                path.
+
+                Options:
+                    -fs mode    Follow folder symlinks. Mode is one
+                                of the following:
+                                    0 - ignore folder symlinks
+                                        (default)
+                                    1 - follow symlinks but try
+                                        to prevent recursion
+                                    2 - follow symlinks
+
+                Example:
+                    lschanged scan "C:\Starting Path" -fs 1 -s C:\Mystore
+
+    compare     Compares the difference between two snapshots and
+                outputs file paths.
+
+                Arguments:
+                    listfile    Outputs file paths to listfile
+                                specified.
+
+                Options
+                    -cm mode    Specifies compare mode:
+                                    lp  - compare last and previous
+                                          snapshots (default)
+                                    lf  - compare last and first
+                                          snapshots
+                                    n,m - compare snapshots with
+                                          ordinals n (more recent)
+                                          and m
+
+                                For lp and lf modes, compare fails if
+                                the store is empty; empty snapshot is
+                                assumed if there is one snapshot in
+                                the store.
+
+                                For n,m mode, compare fails if one of
+                                specified snapshots does not exist.
+                                    
+                    -st states  Outputs files with the following
+                                states (comma-separated):
+                                    n - new files
+                                    m - modified files
+                                    u - unmodified files
+                                    d - deleted files
+                                Default is n,m
+
+                    -rp folder  Outputs file paths relative to the
+                                specified folder. Folder must be an
+                                absolute path. The folder may not
+                                actually exist.
+
+                Example:
+                    lschanged compare C:\changed.txt -cm lf -st n,m,u,d -rp "C:\Starting Path" -s C:\Mystore
+
+    list        Lists snapshots in the store.
+
+                Example:
+                    lschanged list -s C:\Mystore
+
+    delete      Deletes snapshot from the store.
+
+                Arguments:
+                    snapshot    Snapshot ordinal to delete, or
+                                'last' to delete the last snapshot.
+
+                Example:
+                    lschanged delete 4 -s C:\Mystore
+                    lschanged delete last -s C:\Mystore
+
+    clear       Clears the store.
+
+                Arguments:
+                    (none)
+
+                Example:
+                    lschanged clear -s C:\Mystore
