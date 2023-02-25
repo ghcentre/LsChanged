@@ -20,11 +20,6 @@ internal static class Program
             string startingPath = GetStartingPath(args);
             string storePath = GetStorePath(args);
 
-            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinksMode.PreventRecursion);
-            var collector = new FileInfoCollector(collectorSettings);
-            
-            var entries = collector.Collect(startingPath);
-
             var deserializer = new StoreRecordDeserializer();
             var reader = new StoreRecordReader(deserializer);
 
@@ -34,6 +29,11 @@ internal static class Program
             var ctp = new CurrentTimeProvider();
 
             var store = new Store.Store(storePath, ctp, reader, writer);
+
+            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinksMode.PreventRecursion);
+            var collector = new FileInfoCollector(collectorSettings);
+
+            var entries = collector.Collect(startingPath);
 
             var storeRecordFactory = new StoreRecordFactory();
             var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
