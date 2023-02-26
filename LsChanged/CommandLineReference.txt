@@ -12,7 +12,7 @@ Commands:
                 to the store.
 
                 Arguments:
-                    folder      The folder to scan. Must be absolute
+                    path        The path to scan. Must be absolute
                                 path.
 
                 Options:

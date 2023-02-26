@@ -1,8 +1,7 @@
-﻿using LsChanged.Settings;
+﻿using LsChanged.CommandLine;
+using LsChanged.Settings;
 using LsChanged.Store;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
+using LsChanged.Store.Abstractions;
 
 namespace LsChanged;
 
@@ -12,33 +11,20 @@ internal static class Program
     {
         try
         {
-            if (args.Length < 2)
+            var optionsRuleProvider = new OptionRuleProvider();
+            var rules = OptionRuleProvider.Rules;
+            
+            var commandLineParser = new CommandLineParser(rules);
+            
+            var options = commandLineParser.Parse(args);
+            options.Validate();
+
+            var store = InitializeStore(options);
+
+            if (options.Command == Command.Scan)
             {
-                throw new FatalExitException("Usage: lschanged path store", ExitCode.InvalidCommandLineArg);
+                Scan(options, store);
             }
-
-            string startingPath = GetStartingPath(args);
-            string storePath = GetStorePath(args);
-
-            var deserializer = new StoreRecordDeserializer();
-            var reader = new StoreRecordReader(deserializer);
-
-            var serializer = new StoreRecordSerializer();
-            var writer = new StoreRecordWriter(serializer);
-
-            var ctp = new CurrentTimeProvider();
-
-            var store = new Store.Store(storePath, ctp, reader, writer);
-
-            var collectorSettings = new FileInfoCollectorSettings(FollowSymlinksMode.PreventRecursion);
-            var collector = new FileInfoCollector(collectorSettings);
-
-            var entries = collector.Collect(startingPath);
-
-            var storeRecordFactory = new StoreRecordFactory();
-            var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
-
-            store.Add(storeRecord);
 
             return ExitCode.Success;
         }
@@ -54,24 +40,31 @@ internal static class Program
         }
     }
 
-
-    private static string GetStartingPath(string[] args)
+    private static IStore InitializeStore(CommandLineOptions options)
     {
-        string? result = args[0];
-        if (string.IsNullOrEmpty(result))
-        {
-            throw new FatalExitException("Starting path is empty.", ExitCode.InvalidPathSpecified);
-        }
-        return result;
+        var deserializer = new StoreRecordDeserializer();
+        var reader = new StoreRecordReader(deserializer);
+
+        var serializer = new StoreRecordSerializer();
+        var writer = new StoreRecordWriter(serializer);
+
+        var ctp = new CurrentTimeProvider();
+
+        var store = new Store.Store(options.StorePath!, ctp, reader, writer);
+
+        return store;
     }
 
-    private static string GetStorePath(string[] args)
+    private static void Scan(CommandLineOptions options, IStore store)
     {
-        string? result = args[1];
-        if (string.IsNullOrEmpty(result))
-        {
-            throw new FatalExitException("Store is empty.", ExitCode.InvalidPathSpecified);
-        }
-        return result;
+        var collectorSettings = new FileInfoCollectorSettings(options.FollowSymlinks);
+        var collector = new FileInfoCollector(collectorSettings);
+
+        var entries = collector.Collect(options.ScanPath!);
+
+        var storeRecordFactory = new StoreRecordFactory();
+        var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
+
+        store.Add(storeRecord);
     }
 }

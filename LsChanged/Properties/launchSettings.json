@@ -2,7 +2,7 @@
   "profiles": {
     "LsChanged": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\ C:\\TEMP\\LsChangedStore"
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore -v scan C:\\ -fs 1"
     },
     "Linux (WSL)": {
       "commandName": "WSL2",
