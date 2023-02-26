@@ -1,7 +1,10 @@
-﻿using LsChanged.CommandLine;
-using LsChanged.Settings;
+﻿using LsChanged.Collector;
+using LsChanged.CommandLine;
+using LsChanged.Environment;
+using LsChanged.Exceptions;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
+using System.Reflection;
 
 namespace LsChanged;
 
@@ -11,22 +14,48 @@ internal static class Program
     {
         try
         {
-            var optionsRuleProvider = new OptionRuleProvider();
-            var rules = OptionRuleProvider.Rules;
-            
-            var commandLineParser = new CommandLineParser(rules);
+            var commandLineParser = new CommandLineParser(OptionRuleProvider.Rules, o => o.SetCommand(Command.Help));
             
             var options = commandLineParser.Parse(args);
+
+            if (options.Command == Command.Help)
+            {
+                Help();
+                return ExitCode.HelpDisplayed;
+            }
+
             options.Validate();
 
             var store = InitializeStore(options);
 
-            if (options.Command == Command.Scan)
+            switch (options.Command)
             {
-                Scan(options, store);
+                case Command.Scan:
+                    Scan(options, store);
+                    break;
+
+                case Command.Compare:
+                    break;
+
+                case Command.List:
+                    break;
+
+                case Command.Delete:
+                    break;
+
+                case Command.Clear:
+                    break;
+
+                default:
+                    throw new NotSupportedException();
             }
 
             return ExitCode.Success;
+        }
+        catch (CommandLineParseException commandLineParseException)
+        {
+            Console.Error.WriteLine(commandLineParseException.Message);
+            return ExitCode.InvalidCommandLine;
         }
         catch (FatalExitException fatalExitException)
         {
@@ -57,8 +86,7 @@ internal static class Program
 
     private static void Scan(CommandLineOptions options, IStore store)
     {
-        var collectorSettings = new FileInfoCollectorSettings(options.FollowSymlinks);
-        var collector = new FileInfoCollector(collectorSettings);
+        var collector = new FileInfoCollector(options.FollowSymlinks);
 
         var entries = collector.Collect(options.ScanPath!);
 
@@ -66,5 +94,19 @@ internal static class Program
         var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
 
         store.Add(storeRecord);
+    }
+
+    private static void Help()
+    {
+        const string resourceName = "LsChanged.CommandLineReference.txt";
+        var assembly = Assembly.GetExecutingAssembly();
+
+        using var stream = assembly.GetManifestResourceStream(resourceName)
+                           ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");
+        using var reader = new StreamReader(stream);
+        
+        string content = reader.ReadToEnd();
+
+        Console.Out.WriteLine(content);
     }
 }

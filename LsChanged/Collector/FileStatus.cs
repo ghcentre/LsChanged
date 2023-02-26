@@ -1,4 +1,4 @@
-﻿namespace LsChanged;
+﻿namespace LsChanged.Collector;
 
 internal sealed class FileStatus
 {
@@ -11,10 +11,10 @@ internal sealed class FileStatus
     }
 
     public long Size { get; }
-    
+
     public DateTime LastWriteUtc { get; }
-    
+
     public int Attributes { get; }
-    
+
     public int Mode { get; }
 }

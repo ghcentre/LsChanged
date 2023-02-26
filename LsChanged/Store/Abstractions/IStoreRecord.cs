@@ -1,4 +1,6 @@
-﻿namespace LsChanged.Store.Abstractions;
+﻿using LsChanged.Collector;
+
+namespace LsChanged.Store.Abstractions;
 
 internal interface IStoreRecord
 {

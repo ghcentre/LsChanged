@@ -5,20 +5,26 @@ namespace LsChanged.CommandLine;
 internal class CommandLineParser
 {
     private readonly IReadOnlyDictionary<string, OptionRule> _rules;
+    private readonly Action<CommandLineOptions> _emptyCommandLine;
 
-    private readonly HashSet<OptionRule> _unsatisfiedRules;
-
-    public CommandLineParser(IEnumerable<OptionRule> rules)
+    public CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
     {
         ArgumentNullException.ThrowIfNull(rules);
         _rules = rules.ToDictionary(x => x.Prefix, x => x).AsReadOnly();
 
-        _unsatisfiedRules = new HashSet<OptionRule>(rules.Where(x => x.Required));
+        ArgumentNullException.ThrowIfNull(emptyCommandLine);
+        _emptyCommandLine = emptyCommandLine;
     }
 
     public CommandLineOptions Parse(string[] args)
     {
-        var result = new CommandLineOptions();
+        var options = new CommandLineOptions();
+
+        if(args.Length == 0)
+        {
+            _emptyCommandLine(options);
+            return options;
+        }
 
         int index = 0;
         while (index < args.Length)
@@ -37,7 +43,7 @@ internal class CommandLineParser
             var arguments = args.Skip(index + 1).Take(rule.NumArguments);
             try
             {
-                rule.SetOption(result, arguments);
+                rule.SetOption(options, arguments);
             }
             catch (Exception exception)
             {
@@ -46,17 +52,9 @@ internal class CommandLineParser
                     exception);
             }
             
-            _unsatisfiedRules.Remove(rule);
-
             index += 1 + rule.NumArguments;
         }
 
-        if (_unsatisfiedRules.Any())
-        {
-            var rule = _unsatisfiedRules.First();
-            throw new CommandLineParseException($"Required command or option missing: '{rule.Prefix}'.");
-        }
-
-        return result;
+        return options;
     }
 }

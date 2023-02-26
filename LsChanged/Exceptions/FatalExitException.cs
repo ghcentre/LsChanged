@@ -1,4 +1,4 @@
-﻿namespace LsChanged;
+﻿namespace LsChanged.Exceptions;
 
 internal sealed class FatalExitException : Exception
 {

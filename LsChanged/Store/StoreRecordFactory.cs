@@ -1,4 +1,5 @@
-﻿using LsChanged.Store.Abstractions;
+﻿using LsChanged.Collector;
+using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 

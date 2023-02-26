@@ -1,19 +1,17 @@
-﻿using LsChanged.Settings;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace LsChanged;
+namespace LsChanged.Collector;
 
 internal sealed class FileInfoCollector
 {
     private readonly Dictionary<string, FileStatus> _files = new();
     private readonly HashSet<string> _visitedDirectories = new();
 
-    private readonly FileInfoCollectorSettings _settings;
+    private readonly FollowSymlinksMode _followSymlinksMode;
 
-    public FileInfoCollector(FileInfoCollectorSettings settings)
+    public FileInfoCollector(FollowSymlinksMode followSymlinksMode)
     {
-        ArgumentNullException.ThrowIfNull(settings);
-        _settings = settings;
+        _followSymlinksMode = followSymlinksMode;
     }
 
     public IReadOnlyDictionary<string, FileStatus> Collect(string path)
@@ -37,7 +35,7 @@ internal sealed class FileInfoCollector
 
         foreach (string directoryPath in directories)
         {
-            if (_settings.FollowSymlinks == FollowSymlinksMode.Follow)
+            if (_followSymlinksMode == FollowSymlinksMode.Follow)
             {
                 LogAndCollectRecursive(directoryPath);
                 continue;
@@ -45,7 +43,7 @@ internal sealed class FileInfoCollector
 
             string? linkTarget = ResolveLinkTarget(directoryPath);
 
-            if (_settings.FollowSymlinks == FollowSymlinksMode.Skip)
+            if (_followSymlinksMode == FollowSymlinksMode.Skip)
             {
                 if (linkTarget == null)
                 {
@@ -55,7 +53,7 @@ internal sealed class FileInfoCollector
                 continue;
             }
 
-            Debug.Assert(_settings.FollowSymlinks == FollowSymlinksMode.PreventRecursion);
+            Debug.Assert(_followSymlinksMode == FollowSymlinksMode.PreventRecursion);
 
             string checkee = linkTarget ?? directoryPath;
             if (_visitedDirectories.Contains(checkee))
@@ -144,7 +142,7 @@ internal sealed class FileInfoCollector
         {
             return Enumerable.Empty<string>();
         }
-        catch(DirectoryNotFoundException)
+        catch (DirectoryNotFoundException)
         {
             return Enumerable.Empty<string>();
         }

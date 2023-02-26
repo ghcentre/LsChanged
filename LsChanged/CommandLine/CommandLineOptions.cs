@@ -1,5 +1,5 @@
-﻿using LsChanged.Exceptions;
-using LsChanged.Settings;
+﻿using LsChanged.Collector;
+using LsChanged.Exceptions;
 
 namespace LsChanged.CommandLine;
 
@@ -27,8 +27,6 @@ internal class CommandLineOptions
 
     public void Validate()
     {
-        ValidateStorePath();
-
         switch (Command)
         {
             case CommandLine.Command.Scan:
@@ -50,6 +48,8 @@ internal class CommandLineOptions
             default:
                 throw new CommandLineParseException("No command specified.");
         }
+
+        ValidateStorePath();
     }
 
     private void ValidateScanPath()

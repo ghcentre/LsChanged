@@ -1,4 +1,4 @@
-﻿namespace LsChanged.Settings;
+﻿namespace LsChanged.Collector;
 
 internal enum FollowSymlinksMode
 {

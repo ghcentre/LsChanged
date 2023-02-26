@@ -6,5 +6,6 @@ internal enum Command
     Compare,
     List,
     Delete,
-    Clear
+    Clear,
+    Help
 }
