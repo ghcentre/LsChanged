@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using LsChanged.Logging;
+using System.Diagnostics;
 
 namespace LsChanged.Collector;
 
@@ -7,10 +8,17 @@ internal sealed class FileInfoCollector
     private readonly Dictionary<string, FileStatus> _files = new();
     private readonly HashSet<string> _visitedDirectories = new();
 
-    private readonly FollowSymlinksMode _followSymlinksMode;
+    private int _totalFiles;
+    private int _totalDirectories;
 
-    public FileInfoCollector(FollowSymlinksMode followSymlinksMode)
+    private readonly FollowSymlinksMode _followSymlinksMode;
+    private readonly ILogger _logger;
+
+    public FileInfoCollector(ILogger logger, FollowSymlinksMode followSymlinksMode)
     {
+        ArgumentNullException.ThrowIfNull(logger);
+        _logger = logger;
+
         _followSymlinksMode = followSymlinksMode;
     }
 
@@ -20,8 +28,14 @@ internal sealed class FileInfoCollector
 
         _files.Clear();
         _visitedDirectories.Clear();
+        _totalFiles = _totalDirectories = 0;
 
-        CollectRecursive(path);
+        LogAndCollectRecursive(path);
+
+        _logger.Debug(
+            System.Environment.NewLine + "Visited {0} folder(s). Collected {1} file(s).",
+            _totalDirectories,
+            _totalFiles);
 
         return _files.AsReadOnly();
     }
@@ -29,7 +43,10 @@ internal sealed class FileInfoCollector
 
     private void CollectRecursive(string path)
     {
+        _logger.Debug(path);
+
         CollectFiles(path);
+        _totalDirectories++;
 
         var directories = GetDirectories(path);
 
@@ -37,7 +54,7 @@ internal sealed class FileInfoCollector
         {
             if (_followSymlinksMode == FollowSymlinksMode.Follow)
             {
-                LogAndCollectRecursive(directoryPath);
+                CollectRecursive(directoryPath);
                 continue;
             }
 
@@ -47,7 +64,7 @@ internal sealed class FileInfoCollector
             {
                 if (linkTarget == null)
                 {
-                    LogAndCollectRecursive(directoryPath);
+                    CollectRecursive(directoryPath);
                 }
 
                 continue;
@@ -63,7 +80,7 @@ internal sealed class FileInfoCollector
 
             _visitedDirectories.Add(checkee);
 
-            LogAndCollectRecursive(directoryPath);
+            CollectRecursive(directoryPath);
         }
     }
 
@@ -82,7 +99,11 @@ internal sealed class FileInfoCollector
                 continue;
             }
 
-            _files.TryAdd(filePath, status);
+            bool added = _files.TryAdd(filePath, status);
+            if (added)
+            {
+                _totalFiles++;
+            }
         }
     }
 
@@ -146,12 +167,6 @@ internal sealed class FileInfoCollector
         {
             return Enumerable.Empty<string>();
         }
-    }
-
-    private void LogAndCollectRecursive(string directoryPath)
-    {
-        Console.WriteLine(directoryPath);
-        CollectRecursive(directoryPath);
     }
 
     private static string? ResolveLinkTarget(string directoryPath)

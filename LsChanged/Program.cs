@@ -2,6 +2,7 @@
 using LsChanged.CommandLine;
 using LsChanged.Environment;
 using LsChanged.Exceptions;
+using LsChanged.Logging;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
 using System.Reflection;
@@ -12,26 +13,29 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
+        var logger = CreateLogger(null);
+
         try
         {
             var commandLineParser = new CommandLineParser(OptionRuleProvider.Rules, o => o.SetCommand(Command.Help));
-            
             var options = commandLineParser.Parse(args);
 
             if (options.Command == Command.Help)
             {
-                Help();
+                Help(logger);
                 return ExitCode.HelpDisplayed;
             }
 
             options.Validate();
+
+            logger = CreateLogger(options);
 
             var store = InitializeStore(options);
 
             switch (options.Command)
             {
                 case Command.Scan:
-                    Scan(options, store);
+                    Scan(logger, options, store);
                     break;
 
                 case Command.Compare:
@@ -54,17 +58,17 @@ internal static class Program
         }
         catch (CommandLineParseException commandLineParseException)
         {
-            Console.Error.WriteLine(commandLineParseException.Message);
+            logger.Error(commandLineParseException.Message);
             return ExitCode.InvalidCommandLine;
         }
         catch (FatalExitException fatalExitException)
         {
-            Console.Error.WriteLine(fatalExitException.Message);
+            logger.Error(fatalExitException.Message);
             return fatalExitException.ExitCode;
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"Fatal: {exception}");
+            logger.Error("Fatal: {0}", exception);
             return ExitCode.GenericError;
         }
     }
@@ -84,9 +88,9 @@ internal static class Program
         return store;
     }
 
-    private static void Scan(CommandLineOptions options, IStore store)
+    private static void Scan(ILogger logger, CommandLineOptions options, IStore store)
     {
-        var collector = new FileInfoCollector(options.FollowSymlinks);
+        var collector = new FileInfoCollector(logger, options.FollowSymlinks);
 
         var entries = collector.Collect(options.ScanPath!);
 
@@ -96,7 +100,7 @@ internal static class Program
         store.Add(storeRecord);
     }
 
-    private static void Help()
+    private static void Help(ILogger logger)
     {
         const string resourceName = "LsChanged.CommandLineReference.txt";
         var assembly = Assembly.GetExecutingAssembly();
@@ -106,7 +110,13 @@ internal static class Program
         using var reader = new StreamReader(stream);
         
         string content = reader.ReadToEnd();
+        logger.Info(content);
+    }
 
-        Console.Out.WriteLine(content);
+    private static ILogger CreateLogger(CommandLineOptions? options)
+    {
+        bool verbose = options?.Verbose ?? false;
+        var logger = new ConsoleLogger(verbose);
+        return logger;
     }
 }
