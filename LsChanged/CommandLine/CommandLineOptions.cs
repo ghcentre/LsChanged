@@ -16,7 +16,7 @@ internal class CommandLineOptions
         if (Command.HasValue)
         {
             throw new CommandLineParseException(
-                $"The command could not be specИified twice. Command: '{command.ToString().ToLowerInvariant()}'.");
+                $"The command could not be specified twice. Command: '{command.ToString().ToLowerInvariant()}'.");
         }
         Command = command;
     }
