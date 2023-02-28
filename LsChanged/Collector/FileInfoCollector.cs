@@ -30,7 +30,7 @@ internal sealed class FileInfoCollector
         _visitedDirectories.Clear();
         _totalFiles = _totalDirectories = 0;
 
-        LogAndCollectRecursive(path);
+        CollectRecursive(path);
 
         _logger.Debug(
             System.Environment.NewLine + "Visited {0} folder(s). Collected {1} file(s).",
