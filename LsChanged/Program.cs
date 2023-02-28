@@ -39,15 +39,19 @@ internal static class Program
                     break;
 
                 case Command.Compare:
+                    throw new NotImplementedException();
                     break;
 
                 case Command.List:
+                    throw new NotImplementedException();
                     break;
 
                 case Command.Delete:
+                    throw new NotImplementedException();
                     break;
 
                 case Command.Clear:
+                    throw new NotImplementedException();
                     break;
 
                 default:
