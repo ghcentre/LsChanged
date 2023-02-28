@@ -31,6 +31,7 @@ internal class CommandLineOptions
         {
             case CommandLine.Command.Scan:
                 ValidateScanPath();
+                ValidateFollowSymlinksMode();
                 break;
 
             case CommandLine.Command.Compare:
@@ -57,6 +58,15 @@ internal class CommandLineOptions
         if (string.IsNullOrWhiteSpace(ScanPath))
         {
             throw new CommandLineParseException("Scan path could not be empty.");
+        }
+    }
+
+    private void ValidateFollowSymlinksMode()
+    {
+        bool defined = Enum.IsDefined(typeof(FollowSymlinksMode), FollowSymlinks);
+        if (!defined)
+        {
+            throw new CommandLineParseException("Invalid follow symlinks mode.");
         }
     }
 
