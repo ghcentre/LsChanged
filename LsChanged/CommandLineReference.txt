@@ -54,7 +54,7 @@ Commands:
                                     
                     -st states  Outputs files with the following
                                 states (comma-separated):
-                                    n - new files
+                                    a - added files
                                     m - modified files
                                     u - unmodified files
                                     d - deleted files
