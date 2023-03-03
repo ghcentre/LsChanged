@@ -1,4 +1,5 @@
 ﻿using LsChanged.Collector;
+using LsChanged.Compare;
 using LsChanged.Exceptions;
 
 namespace LsChanged.CommandLine;
@@ -21,9 +22,27 @@ internal class CommandLineOptions
         Command = command;
     }
 
+    #region Scan
+    
     public string? ScanPath { get; set; } = default;
 
-    public FollowSymlinksMode FollowSymlinks { get; set; } = FollowSymlinksMode.Skip;
+    public FollowSymlinksMode FollowSymlinksMode { get; set; } = FollowSymlinksMode.Skip;
+
+    #endregion
+
+    #region Compare
+
+    public string? CompareOutputFile { get; set; } = default;
+
+    public CompareMode CompareMode { get; set; } = CompareMode.LastPrevious;
+    
+    public int? NewCompareSnapshot { get; set; }
+
+    public int? OldCompareSnapshot { get; set; }
+
+    public CompareFileStates CompareFileStates { get; set; } = CompareFileStates.Added | CompareFileStates.Modified;
+
+    #endregion
 
     public void Validate()
     {
@@ -35,6 +54,7 @@ internal class CommandLineOptions
                 break;
 
             case CommandLine.Command.Compare:
+                ValidateCompareModeSnapshots();
                 break;
 
             case CommandLine.Command.List:
@@ -53,6 +73,8 @@ internal class CommandLineOptions
         ValidateStorePath();
     }
 
+    #region Scan
+
     private void ValidateScanPath()
     {
         if (string.IsNullOrWhiteSpace(ScanPath))
@@ -63,12 +85,28 @@ internal class CommandLineOptions
 
     private void ValidateFollowSymlinksMode()
     {
-        bool defined = Enum.IsDefined(typeof(FollowSymlinksMode), FollowSymlinks);
+        bool defined = Enum.IsDefined(typeof(FollowSymlinksMode), FollowSymlinksMode);
         if (!defined)
         {
             throw new CommandLineParseException("Invalid follow symlinks mode.");
         }
     }
+
+    #endregion
+
+    #region Compare
+
+    private void ValidateCompareModeSnapshots()
+    {
+        if (CompareMode == CompareMode.SpecifiedSnapshots &&
+            (!NewCompareSnapshot.HasValue || !OldCompareSnapshot.HasValue))
+        {
+            throw new CommandLineParseException(
+                "Comparing between two specified snapshots requires exactly two snapshot ordinals.");
+        }
+    }
+
+    #endregion
 
     private void ValidateStorePath()
     {

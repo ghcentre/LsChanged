@@ -1,12 +1,16 @@
 {
   "profiles": {
-    "LsChanged": {
-      "commandName": "Project",
-      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore -v scan C:\\ -fs 1"
-    },
     "Linux (WSL)": {
       "commandName": "WSL2",
       "commandLineArgs": "{OutDir}/LsChanged.dll /proc /mnt/c/TEMP/files-wsl.json"
+    },
+    "LsChanged scan": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore scan C:\\ -fs 1"
+    },
+    "LsChanged compare": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare c:\\temp\\compare.txt -cm lg"
     }
   }
 }

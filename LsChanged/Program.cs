@@ -39,7 +39,7 @@ internal static class Program
                     break;
 
                 case Command.Compare:
-                    throw new NotImplementedException();
+                    Compare(logger, options, store);
                     break;
 
                 case Command.List:
@@ -94,7 +94,7 @@ internal static class Program
 
     private static void Scan(ILogger logger, CommandLineOptions options, IStore store)
     {
-        var collector = new FileInfoCollector(logger, options.FollowSymlinks);
+        var collector = new FileInfoCollector(logger, options.FollowSymlinksMode);
 
         var entries = collector.Collect(options.ScanPath!);
 
@@ -102,6 +102,15 @@ internal static class Program
         var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
 
         store.Add(storeRecord);
+    }
+
+    private static void Compare(ILogger logger, CommandLineOptions options, IStore store)
+    {
+        Console.WriteLine($"Compare mode: {options.CompareMode}");
+        Console.WriteLine($"Output file: {options.CompareOutputFile}");
+        Console.WriteLine($"Snapshots: {options.NewCompareSnapshot},{options.OldCompareSnapshot}");
+
+        throw new NotImplementedException();
     }
 
     private static void Help(ILogger logger)

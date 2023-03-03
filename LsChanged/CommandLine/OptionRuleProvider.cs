@@ -1,4 +1,6 @@
 ﻿using LsChanged.Collector;
+using LsChanged.Compare;
+using LsChanged.Exceptions;
 
 namespace LsChanged.CommandLine;
 
@@ -10,6 +12,8 @@ internal class OptionRuleProvider
         {
             var rules = new[]
             {
+                #region Scan
+
                 new OptionRule("scan", 1,
                     (o, a) =>
                     {
@@ -20,14 +24,55 @@ internal class OptionRuleProvider
                 new OptionRule("-fs", 1,
                     (o, a) =>
                     {
-                        o.FollowSymlinks = Enum.Parse<FollowSymlinksMode>(a.First());
+                        o.FollowSymlinksMode = Enum.Parse<FollowSymlinksMode>(a.First());
                     }),
+
+                #endregion
+
+                #region Compare
 
                 new OptionRule("compare", 1,
                     (o, a) =>
                     {
-                        throw new NotImplementedException();
+                        o.SetCommand(Command.Compare);
+                        o.CompareOutputFile = a.First();
                     }),
+
+                new OptionRule("-cm", 1,
+                    (o, a) =>
+                    {
+                        string modeString = a.First();
+                        if (modeString == "lp")
+                        {
+                            o.CompareMode = CompareMode.LastPrevious;
+                            return;
+                        }
+                        if (modeString == "lf")
+                        {
+                            o.CompareMode = CompareMode.LastFirst;
+                            return;
+                        }
+
+                        if (modeString.Count(c => c == ',') == 1)
+                        {
+                            string[] snapshotOrdinalStrings = modeString
+                                .Split(',')
+                                .Where(x => x.All(c => char.IsAsciiDigit(c)))
+                                .ToArray();
+                            if (snapshotOrdinalStrings.Length == 2)
+                            {
+                                o.NewCompareSnapshot = int.Parse(snapshotOrdinalStrings[0]);
+                                o.OldCompareSnapshot = int.Parse(snapshotOrdinalStrings[1]);
+
+                                return;
+                            }
+                        }
+                        throw new CommandLineParseException(
+                            "Compare mode option must be lp, lf, or exactly two numeric arguments separated by comma.");
+                    }),
+
+	            #endregion
+
 
                 new OptionRule("list", 0,
                     (o, _) =>
