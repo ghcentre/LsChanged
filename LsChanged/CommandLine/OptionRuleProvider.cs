@@ -71,6 +71,33 @@ internal class OptionRuleProvider
                             "Compare mode option must be lp, lf, or exactly two numeric arguments separated by comma.");
                     }),
 
+                new OptionRule("-st", 1,
+                    (o, a) =>
+                    {
+                        var fileStates = CompareFileStates.None;
+                        string[] states = a.First().Split(",");
+                        foreach (string stateString in states)
+                        {
+                            var state = stateString switch
+                            {
+                                "a" => CompareFileStates.Added,
+                                "m" => CompareFileStates.Modified,
+                                "u" => CompareFileStates.Unmodified,
+                                "d" => CompareFileStates.Deleted,
+                                _ => throw new CommandLineParseException(
+                                        "Compare file states requires any combination of a,m,u,d in any order.")
+                            };
+                            fileStates |= state;
+                        }
+                        o.CompareFileStates = fileStates;
+                    }),
+
+                new OptionRule("-rp", 1,
+                    (o, a) =>
+                    {
+                        o.CompareRelativePath = a.First();
+                    }),
+
 	            #endregion
 
 

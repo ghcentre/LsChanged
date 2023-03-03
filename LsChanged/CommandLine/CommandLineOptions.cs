@@ -42,6 +42,8 @@ internal class CommandLineOptions
 
     public CompareFileStates CompareFileStates { get; set; } = CompareFileStates.Added | CompareFileStates.Modified;
 
+    public string? CompareRelativePath { get; set; } = default;
+
     #endregion
 
     public void Validate()

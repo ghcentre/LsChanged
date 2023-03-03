@@ -109,6 +109,8 @@ internal static class Program
         Console.WriteLine($"Compare mode: {options.CompareMode}");
         Console.WriteLine($"Output file: {options.CompareOutputFile}");
         Console.WriteLine($"Snapshots: {options.NewCompareSnapshot},{options.OldCompareSnapshot}");
+        Console.WriteLine($"FileStates: {options.CompareFileStates}");
+        Console.WriteLine($"RelativePath: {options.CompareRelativePath}");
 
         throw new NotImplementedException();
     }
