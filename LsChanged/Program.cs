@@ -6,7 +6,6 @@ using LsChanged.ProgramRunner;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Reflection;
 
 namespace LsChanged;
@@ -23,6 +22,7 @@ internal static class Program
         try
         {
             var options = serviceProvider.GetRequiredService<CommandLineOptions>();
+
             var logger = loggerFactory.CreateLogger();
 
             //
@@ -36,10 +36,10 @@ internal static class Program
 
             options.Validate();
 
-            var strategyFactory = serviceProvider.GetRequiredService<Func<IRunnerStrategy>>();
-            var strategy = strategyFactory();
+            var strategy = serviceProvider.GetRequiredService<IRunnerStrategy>();
 
             int exitCode = strategy.Run();
+
             return exitCode;
         }
         catch (CommandLineParseException commandLineParseException)
@@ -63,15 +63,6 @@ internal static class Program
     {
         var services = new ServiceCollection();
 
-        services.AddTransient<ILoggerFactory, LoggerFactory>();
-        services.AddTransient<ILogger>(
-            sp =>
-            {
-                var factory = sp.GetRequiredService<ILoggerFactory>();
-                var instance = factory.CreateLogger();
-                return instance;
-            });
-
         services.AddSingleton(
             sp =>
             {
@@ -81,6 +72,15 @@ internal static class Program
             });
         services.AddSingleton(
             sp => new Func<CommandLineOptions>(() => sp.GetRequiredService<CommandLineOptions>()));
+
+        services.AddTransient<ILoggerFactory, LoggerFactory>();
+        services.AddTransient(
+            sp =>
+            {
+                var factory = sp.GetRequiredService<ILoggerFactory>();
+                var instance = factory.CreateLogger();
+                return instance;
+            });
 
         services.AddTransient<IStoreRecordFactory, StoreRecordFactory>();
 
@@ -112,24 +112,22 @@ internal static class Program
         services.AddTransient<ListStrategy>();
         services.AddTransient<CompareStrategy>();
 
-        services.AddSingleton(
-            sp => new Func<IRunnerStrategy>(
-                () =>
+        services.AddTransient(
+            sp =>
+            {
+                var options = sp.GetRequiredService<CommandLineOptions>();
+                var command = options.Command;
+                IRunnerStrategy strategy = command switch
                 {
-                    var options = sp.GetRequiredService<CommandLineOptions>();
-                    var command = options.Command;
-                    IRunnerStrategy strategy = command switch
-                    {
-                        Command.Scan => sp.GetRequiredService<ScanStrategy>(),
-                        Command.Compare => sp.GetRequiredService<CompareStrategy>(),
-                        Command.List => sp.GetRequiredService<ListStrategy>(),
-                        Command.Delete => throw new NotImplementedException(),
-                        Command.Clear => throw new NotImplementedException(),
-                        _ => throw new NotSupportedException(),
-                    };
-                    return strategy;
-                })
-            );
+                    Command.Scan => sp.GetRequiredService<ScanStrategy>(),
+                    Command.Compare => sp.GetRequiredService<CompareStrategy>(),
+                    Command.List => sp.GetRequiredService<ListStrategy>(),
+                    Command.Delete => throw new NotImplementedException(),
+                    Command.Clear => throw new NotImplementedException(),
+                    _ => throw new NotSupportedException(),
+                };
+                return strategy;
+            });
 
         var provider = services.BuildServiceProvider();
         return provider;
