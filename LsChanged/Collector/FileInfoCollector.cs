@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace LsChanged.Collector;
 
-internal sealed class FileInfoCollector
+internal sealed class FileInfoCollector : IFileInfoCollector
 {
     private readonly Dictionary<string, FileStatus> _files = new();
     private readonly HashSet<string> _visitedDirectories = new();

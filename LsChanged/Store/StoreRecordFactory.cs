@@ -3,7 +3,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 
-internal class StoreRecordFactory
+internal class StoreRecordFactory : IStoreRecordFactory
 {
     public IStoreRecord CreateFromFiles(DateTime createdAt, IReadOnlyDictionary<string, FileStatus> files)
     {

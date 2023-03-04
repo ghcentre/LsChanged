@@ -2,6 +2,7 @@
 using LsChanged.CommandLine;
 using LsChanged.Exceptions;
 using LsChanged.Logging;
+using LsChanged.ProgramRunner;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,13 @@ internal static class Program
         var services = new ServiceCollection();
 
         services.AddTransient<ILoggerFactory, LoggerFactory>();
+        services.AddTransient<ILogger>(
+            sp =>
+            {
+                var factory = sp.GetRequiredService<ILoggerFactory>();
+                var instance = factory.CreateLogger();
+                return instance;
+            });
 
         services.AddSingleton(
             sp =>
@@ -27,6 +35,8 @@ internal static class Program
         services.AddSingleton(
             sp => new Func<CommandLineOptions>(() => sp.GetRequiredService<CommandLineOptions>()));
 
+        services.AddTransient<IStoreRecordFactory, StoreRecordFactory>();
+
         services.AddTransient<IStoreRecordDeserializer, StoreRecordDeserializer>();
         services.AddTransient<IStoreRecordSerializer, StoreRecordSerializer>();
         services.AddTransient<IStoreRecordReader, StoreRecordReader>();
@@ -37,12 +47,33 @@ internal static class Program
             sp =>
             {
                 var options = sp.GetRequiredService<CommandLineOptions>();
-                var instance = new Store.Store(options.StorePath!,
-                                               sp.GetRequiredService<ICurrentTimeProvider>(),
-                                               sp.GetRequiredService<IStoreRecordReader>(),
-                                               sp.GetRequiredService<IStoreRecordWriter>());
+                var instance = new Store.Store(
+                    options.StorePath!,
+                    sp.GetRequiredService<ICurrentTimeProvider>(),
+                    sp.GetRequiredService<IStoreRecordReader>(),
+                    sp.GetRequiredService<IStoreRecordWriter>());
                 return instance;
             });
+
+        services.AddSingleton(
+            sp =>
+            new Func<CommandLineOptions, IFileInfoCollector>(
+                o =>
+                new FileInfoCollector(sp.GetRequiredService<ILogger>(), o.FollowSymlinksMode)));
+
+        services.AddSingleton(
+            sp => new Func<ScanStrategy>(
+                () =>
+                {
+                    var instance = new ScanStrategy(
+                        sp.GetRequiredService<ILogger>(),
+                        sp.GetRequiredService<CommandLineOptions>(),
+                        sp.GetRequiredService<IStore>(),
+                        sp.GetRequiredService<Func<CommandLineOptions, IFileInfoCollector>>(),
+                        sp.GetRequiredService<IStoreRecordFactory>(),
+                        sp.GetRequiredService<ICurrentTimeProvider>());
+                    return instance;
+                }));
 
         var provider = services.BuildServiceProvider();
         return provider;
@@ -69,34 +100,36 @@ internal static class Program
             options.Validate();
 
             var store = serviceProvider.GetRequiredService<IStore>();
+            int exitCode;
 
             switch (options.Command)
             {
                 case Command.Scan:
-                    Scan(logger, options, store);
+                    var scanStrategy = serviceProvider.GetRequiredService<Func<ScanStrategy>>()();
+                    exitCode = scanStrategy.Run();
                     break;
 
                 case Command.Compare:
                     Compare(logger, options, store);
+                    exitCode = ExitCode.Success;
                     break;
 
                 case Command.List:
                     List(logger, store);
+                    exitCode = ExitCode.Success;
                     break;
 
                 case Command.Delete:
                     throw new NotImplementedException();
-                    break;
 
                 case Command.Clear:
                     throw new NotImplementedException();
-                    break;
 
                 default:
                     throw new NotSupportedException();
             }
 
-            return ExitCode.Success;
+            return exitCode;
         }
         catch (CommandLineParseException commandLineParseException)
         {
@@ -113,18 +146,6 @@ internal static class Program
             bootstrapLogger.Error("Fatal: {0}", exception);
             return ExitCode.GenericError;
         }
-    }
-
-    private static void Scan(ILogger logger, CommandLineOptions options, IStore store)
-    {
-        var collector = new FileInfoCollector(logger, options.FollowSymlinksMode);
-
-        var entries = collector.Collect(options.ScanPath!);
-
-        var storeRecordFactory = new StoreRecordFactory();
-        var storeRecord = storeRecordFactory.CreateFromFiles(DateTime.UtcNow, entries);
-
-        store.Add(storeRecord);
     }
 
     private static void Compare(ILogger logger, CommandLineOptions options, IStore store)
@@ -173,13 +194,5 @@ internal static class Program
     }
 
 
-    internal static class ExitCode
-    {
-        public const int Success = 0;
-        public const int InvalidCommandLine = 1;
-        public const int InvalidPathSpecified = 2;
-        public const int WriteError = 3;
-        public const int HelpDisplayed = 254;
-        public const int GenericError = 255;
-    }
+   
 }
