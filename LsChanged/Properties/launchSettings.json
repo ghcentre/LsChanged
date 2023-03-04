@@ -14,7 +14,7 @@
     },
     "LsChanged list": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore list -v"
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore list"
     }
   }
 }

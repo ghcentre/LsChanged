@@ -74,6 +74,7 @@ internal static class Program
                         sp.GetRequiredService<ICurrentTimeProvider>());
                     return instance;
                 }));
+        services.AddTransient<ListStrategy>(); // TODO: replace with Func for stragegy impl
 
         var provider = services.BuildServiceProvider();
         return provider;
@@ -91,6 +92,9 @@ internal static class Program
             var options = serviceProvider.GetRequiredService<CommandLineOptions>();
             var logger = loggerFactory.CreateLogger();
 
+            //
+            // help does not require IStore and '-s' switch, so we handle it specifically
+            //
             if (options.Command == Command.Help)
             {
                 Help(bootstrapLogger);
@@ -115,8 +119,8 @@ internal static class Program
                     break;
 
                 case Command.List:
-                    List(logger, store);
-                    exitCode = ExitCode.Success;
+                    var listStrategy = serviceProvider.GetRequiredService<ListStrategy>();
+                    exitCode = listStrategy.Run();
                     break;
 
                 case Command.Delete:
@@ -165,21 +169,6 @@ internal static class Program
         throw new NotImplementedException();
     }
 
-    private static void List(ILogger logger, IStore store)
-    {
-        var entries = store.ListAll().ToList();
-
-        logger.Debug("     # Id");
-        logger.Debug("------ --------------------------------------------------");
-
-        for (int i = 0; i < entries.Count; i++)
-        {
-            logger.Info("{0,6} {1}", i, entries[i].Id);
-        }
-
-        logger.Debug(Environment.NewLine + "Total: {0}", entries.Count);
-    }
-
     private static void Help(ILogger logger)
     {
         const string resourceName = "LsChanged.CommandLineReference.txt";
@@ -192,7 +181,4 @@ internal static class Program
         string content = reader.ReadToEnd();
         logger.Info(content);
     }
-
-
-   
 }
