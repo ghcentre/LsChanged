@@ -47,6 +47,11 @@ internal static class Program
             bootstrapLogger.Error(commandLineParseException.Message);
             return ExitCode.InvalidCommandLine;
         }
+        catch (SnapshotNotFoundException shapshotNotFoundException)
+        {
+            bootstrapLogger.Error(shapshotNotFoundException.Message);
+            return ExitCode.SnapshotNotFound;
+        }
         catch (FatalExitException fatalExitException)
         {
             bootstrapLogger.Error(fatalExitException.Message);
@@ -111,6 +116,7 @@ internal static class Program
         services.AddTransient<ScanStrategy>();
         services.AddTransient<ListStrategy>();
         services.AddTransient<CompareStrategy>();
+        services.AddTransient<DeleteStrategy>();
         services.AddTransient<ClearStrategy>();
 
         services.AddTransient(
@@ -123,7 +129,7 @@ internal static class Program
                     Command.Scan => sp.GetRequiredService<ScanStrategy>(),
                     Command.Compare => sp.GetRequiredService<CompareStrategy>(),
                     Command.List => sp.GetRequiredService<ListStrategy>(),
-                    Command.Delete => throw new NotImplementedException(),
+                    Command.Delete => sp.GetRequiredService<DeleteStrategy>(),
                     Command.Clear => sp.GetRequiredService<ClearStrategy>(),
                     _ => throw new NotSupportedException(),
                 };

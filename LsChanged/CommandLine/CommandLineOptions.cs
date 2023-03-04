@@ -35,14 +35,20 @@ internal class CommandLineOptions
     public string? CompareOutputFile { get; set; } = default;
 
     public CompareMode CompareMode { get; set; } = CompareMode.LastPrevious;
-    
-    public int? NewCompareSnapshot { get; set; }
 
-    public int? OldCompareSnapshot { get; set; }
+    public int? NewCompareSnapshot { get; set; } = default;
+
+    public int? OldCompareSnapshot { get; set; } = default;
 
     public CompareFileStates CompareFileStates { get; set; } = CompareFileStates.Added | CompareFileStates.Modified;
 
     public string? CompareRelativePath { get; set; } = default;
+
+    #endregion
+
+    #region Delete
+
+    public int? SnaphotToDelete { get; set; } = default;
 
     #endregion
 

@@ -103,7 +103,7 @@ internal class Store : IStore
         }
     }
 
-    public bool Remove(IStoreEntry storeEntry)
+    public bool Delete(IStoreEntry storeEntry)
     {
         ArgumentNullException.ThrowIfNull(storeEntry);
 

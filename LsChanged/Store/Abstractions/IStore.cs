@@ -10,7 +10,7 @@ internal interface IStore
 
     IStoreEntry Add(IStoreRecord storeRecord);
 
-    bool Remove(IStoreEntry storeEntry);
+    bool Delete(IStoreEntry storeEntry);
 
     void Clear();
 }

@@ -106,14 +106,33 @@ internal class OptionRuleProvider
                 o.SetCommand(Command.List);
             }),
 
-	    #endregion
+        #endregion
 
+        #region Delete
 
         new OptionRule("delete", 1,
             (o, a) =>
             {
-                throw new NotImplementedException();
+                o.SetCommand(Command.Delete);
+
+                string snapshotOrdinal = a.First();
+
+                if (snapshotOrdinal == "last")
+                {
+                    o.SnaphotToDelete = null;
+                    return;
+                }
+
+                if (int.TryParse(snapshotOrdinal, out int snapshotInt))
+                {
+                    o.SnaphotToDelete = snapshotInt;
+                    return;
+                }
+
+                throw new CommandLineParseException("Snapshot to delete must be 'last' or an integer value.");
             }),
+
+	    #endregion
 
         #region Clear
 

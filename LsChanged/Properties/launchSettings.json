@@ -19,6 +19,10 @@
     "LsChanged clear": {
       "commandName": "Project",
       "commandLineArgs": "-s C:\\TEMP\\LsChangedStore clear -v"
+    },
+    "LsChanged delete": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore delete last"
     }
   }
 }
