@@ -75,6 +75,7 @@ internal static class Program
                     return instance;
                 }));
         services.AddTransient<ListStrategy>(); // TODO: replace with Func for stragegy impl
+        services.AddTransient<CompareStrategy>(); // TODO: replace with Func for stragegy impl
 
         var provider = services.BuildServiceProvider();
         return provider;
@@ -104,35 +105,18 @@ internal static class Program
             options.Validate();
 
             var store = serviceProvider.GetRequiredService<IStore>();
-            int exitCode;
 
-            switch (options.Command)
+            IRunnerStrategy strategy = options.Command switch
             {
-                case Command.Scan:
-                    var scanStrategy = serviceProvider.GetRequiredService<Func<ScanStrategy>>()();
-                    exitCode = scanStrategy.Run();
-                    break;
+                Command.Scan => serviceProvider.GetRequiredService<Func<ScanStrategy>>()(),
+                Command.Compare => serviceProvider.GetRequiredService<CompareStrategy>(),
+                Command.List => serviceProvider.GetRequiredService<ListStrategy>(),
+                Command.Delete => throw new NotImplementedException(),
+                Command.Clear => throw new NotImplementedException(),
+                _ => throw new NotSupportedException(),
+            };
 
-                case Command.Compare:
-                    Compare(logger, options, store);
-                    exitCode = ExitCode.Success;
-                    break;
-
-                case Command.List:
-                    var listStrategy = serviceProvider.GetRequiredService<ListStrategy>();
-                    exitCode = listStrategy.Run();
-                    break;
-
-                case Command.Delete:
-                    throw new NotImplementedException();
-
-                case Command.Clear:
-                    throw new NotImplementedException();
-
-                default:
-                    throw new NotSupportedException();
-            }
-
+            int exitCode = strategy.Run();
             return exitCode;
         }
         catch (CommandLineParseException commandLineParseException)
@@ -150,23 +134,6 @@ internal static class Program
             bootstrapLogger.Error("Fatal: {0}", exception);
             return ExitCode.GenericError;
         }
-    }
-
-    private static void Compare(ILogger logger, CommandLineOptions options, IStore store)
-    {
-        Console.WriteLine($"Compare mode: {options.CompareMode}");
-        Console.WriteLine($"Output file: {options.CompareOutputFile}");
-        Console.WriteLine($"Snapshots: {options.NewCompareSnapshot},{options.OldCompareSnapshot}");
-        Console.WriteLine($"FileStates: {options.CompareFileStates}");
-        Console.WriteLine($"RelativePath: {options.CompareRelativePath}");
-
-        if (options.CompareMode == LsChanged.Compare.CompareMode.SpecifiedSnapshots)
-        {
-            var newSnapshot = store.GetByOrdinal(options.NewCompareSnapshot!.Value);
-            var oldSnapshot = store.GetByOrdinal(options.OldCompareSnapshot!.Value);
-        }
-
-        throw new NotImplementedException();
     }
 
     private static void Help(ILogger logger)
