@@ -4,32 +4,71 @@ using LsChanged.Exceptions;
 using LsChanged.Logging;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace LsChanged;
 
 internal static class Program
 {
+    private static ServiceProvider CreateAndBuildServiceProvider(string[] args)
+    {
+        var services = new ServiceCollection();
+
+        services.AddTransient<ILoggerFactory, LoggerFactory>();
+
+        services.AddSingleton(
+            sp =>
+            {
+                var commandLineParser = new CommandLineParser(OptionRuleProvider.Rules, o => o.SetCommand(Command.Help));
+                var options = commandLineParser.Parse(args);
+                return options;
+            });
+        services.AddSingleton(
+            sp => new Func<CommandLineOptions>(() => sp.GetRequiredService<CommandLineOptions>()));
+
+        services.AddTransient<IStoreRecordDeserializer, StoreRecordDeserializer>();
+        services.AddTransient<IStoreRecordSerializer, StoreRecordSerializer>();
+        services.AddTransient<IStoreRecordReader, StoreRecordReader>();
+        services.AddTransient<IStoreRecordWriter, StoreRecordWriter>();
+        services.AddTransient<ICurrentTimeProvider, CurrentTimeProvider>();
+
+        services.AddSingleton<IStore>(
+            sp =>
+            {
+                var options = sp.GetRequiredService<CommandLineOptions>();
+                var instance = new Store.Store(options.StorePath!,
+                                               sp.GetRequiredService<ICurrentTimeProvider>(),
+                                               sp.GetRequiredService<IStoreRecordReader>(),
+                                               sp.GetRequiredService<IStoreRecordWriter>());
+                return instance;
+            });
+
+        var provider = services.BuildServiceProvider();
+        return provider;
+    }
+
     private static int Main(string[] args)
     {
-        var logger = CreateLogger(null);
+        var serviceProvider = CreateAndBuildServiceProvider(args);
+
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        var bootstrapLogger = loggerFactory.CreateBootstrapLogger();
 
         try
         {
-            var commandLineParser = new CommandLineParser(OptionRuleProvider.Rules, o => o.SetCommand(Command.Help));
-            var options = commandLineParser.Parse(args);
+            var options = serviceProvider.GetRequiredService<CommandLineOptions>();
+            var logger = loggerFactory.CreateLogger();
 
             if (options.Command == Command.Help)
             {
-                Help(logger);
+                Help(bootstrapLogger);
                 return ExitCode.HelpDisplayed;
             }
 
             options.Validate();
 
-            logger = CreateLogger(options);
-
-            var store = InitializeStore(options);
+            var store = serviceProvider.GetRequiredService<IStore>();
 
             switch (options.Command)
             {
@@ -61,34 +100,19 @@ internal static class Program
         }
         catch (CommandLineParseException commandLineParseException)
         {
-            logger.Error(commandLineParseException.Message);
+            bootstrapLogger.Error(commandLineParseException.Message);
             return ExitCode.InvalidCommandLine;
         }
         catch (FatalExitException fatalExitException)
         {
-            logger.Error(fatalExitException.Message);
+            bootstrapLogger.Error(fatalExitException.Message);
             return fatalExitException.ExitCode;
         }
         catch (Exception exception)
         {
-            logger.Error("Fatal: {0}", exception);
+            bootstrapLogger.Error("Fatal: {0}", exception);
             return ExitCode.GenericError;
         }
-    }
-
-    private static IStore InitializeStore(CommandLineOptions options)
-    {
-        var deserializer = new StoreRecordDeserializer();
-        var reader = new StoreRecordReader(deserializer);
-
-        var serializer = new StoreRecordSerializer();
-        var writer = new StoreRecordWriter(serializer);
-
-        var ctp = new CurrentTimeProvider();
-
-        var store = new Store.Store(options.StorePath!, ctp, reader, writer);
-
-        return store;
     }
 
     private static void Scan(ILogger logger, CommandLineOptions options, IStore store)
@@ -148,12 +172,6 @@ internal static class Program
         logger.Info(content);
     }
 
-    private static ILogger CreateLogger(CommandLineOptions? options)
-    {
-        bool verbose = options?.Verbose ?? false;
-        var logger = new ConsoleLogger(verbose);
-        return logger;
-    }
 
     internal static class ExitCode
     {
