@@ -63,8 +63,7 @@ internal class Store : IStore
 
     public IEnumerable<IStoreEntry> ListAll()
     {
-        var files = Directory.GetFiles(_pathToStore)
-            .Where(x => Path.GetFileName(x) != _markerFileName);
+        var files = GetEntryFiles();
 
         var entries = files.Select(x => _storeEntryFactory(x)).ToList();
         return entries;
@@ -97,7 +96,7 @@ internal class Store : IStore
 
     public void Clear()
     {
-        var files = Directory.GetFiles(_pathToStore);
+        var files = GetEntryFiles();
         foreach (var file in files)
         {
             File.Delete(file);
@@ -128,6 +127,13 @@ internal class Store : IStore
         {
             throw new StoreInaccessibleException(exception);
         }
+    }
+
+    private IEnumerable<string> GetEntryFiles()
+    {
+        var files = Directory.GetFiles(_pathToStore)
+            .Where(x => Path.GetFileName(x) != _markerFileName);
+        return files;
     }
 
     private IStoreEntry NewStoreEntry()

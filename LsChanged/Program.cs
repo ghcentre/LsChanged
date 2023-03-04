@@ -111,6 +111,7 @@ internal static class Program
         services.AddTransient<ScanStrategy>();
         services.AddTransient<ListStrategy>();
         services.AddTransient<CompareStrategy>();
+        services.AddTransient<ClearStrategy>();
 
         services.AddTransient(
             sp =>
@@ -123,7 +124,7 @@ internal static class Program
                     Command.Compare => sp.GetRequiredService<CompareStrategy>(),
                     Command.List => sp.GetRequiredService<ListStrategy>(),
                     Command.Delete => throw new NotImplementedException(),
-                    Command.Clear => throw new NotImplementedException(),
+                    Command.Clear => sp.GetRequiredService<ClearStrategy>(),
                     _ => throw new NotSupportedException(),
                 };
                 return strategy;

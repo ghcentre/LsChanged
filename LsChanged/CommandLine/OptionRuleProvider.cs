@@ -115,11 +115,15 @@ internal class OptionRuleProvider
                 throw new NotImplementedException();
             }),
 
+        #region Clear
+
         new OptionRule("clear", 0,
             (o, _) =>
             {
-                throw new NotImplementedException();
+                o.SetCommand(Command.Clear);
             }),
+
+	    #endregion
 
         new OptionRule("-s", 1,
             (o, a) =>

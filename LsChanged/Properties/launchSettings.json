@@ -15,6 +15,10 @@
     "LsChanged list": {
       "commandName": "Project",
       "commandLineArgs": "-s C:\\TEMP\\LsChangedStore list"
+    },
+    "LsChanged clear": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore clear -v"
     }
   }
 }
