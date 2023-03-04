@@ -1,6 +1,5 @@
 ﻿using LsChanged.Collector;
 using LsChanged.CommandLine;
-using LsChanged.Environment;
 using LsChanged.Exceptions;
 using LsChanged.Logging;
 using LsChanged.Store;
@@ -124,7 +123,7 @@ internal static class Program
     private static void List(ILogger logger, IStore store)
     {
         var entries = store.ListAll().ToList();
-        
+
         logger.Debug("     # Id");
         logger.Debug("------ --------------------------------------------------");
 
@@ -133,7 +132,7 @@ internal static class Program
             logger.Info("{0,6} {1}", i, entries[i].Id);
         }
 
-        logger.Debug(System.Environment.NewLine + "Total: {0}", entries.Count);
+        logger.Debug(Environment.NewLine + "Total: {0}", entries.Count);
     }
 
     private static void Help(ILogger logger)
@@ -144,7 +143,7 @@ internal static class Program
         using var stream = assembly.GetManifestResourceStream(resourceName)
                            ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");
         using var reader = new StreamReader(stream);
-        
+
         string content = reader.ReadToEnd();
         logger.Info(content);
     }
@@ -154,5 +153,15 @@ internal static class Program
         bool verbose = options?.Verbose ?? false;
         var logger = new ConsoleLogger(verbose);
         return logger;
+    }
+
+    internal static class ExitCode
+    {
+        public const int Success = 0;
+        public const int InvalidCommandLine = 1;
+        public const int InvalidPathSpecified = 2;
+        public const int WriteError = 3;
+        public const int HelpDisplayed = 254;
+        public const int GenericError = 255;
     }
 }

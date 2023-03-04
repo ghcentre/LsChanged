@@ -33,7 +33,7 @@ internal sealed class FileInfoCollector
         CollectRecursive(path);
 
         _logger.Debug(
-            System.Environment.NewLine + "Visited {0} folder(s). Collected {1} file(s).",
+            Environment.NewLine + "Visited {0} folder(s). Collected {1} file(s).",
             _totalDirectories,
             _totalFiles);
 
