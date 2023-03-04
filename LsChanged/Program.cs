@@ -12,6 +12,59 @@ namespace LsChanged;
 
 internal static class Program
 {
+    private static int Main(string[] args)
+    {
+        var serviceProvider = CreateAndBuildServiceProvider(args);
+
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        var bootstrapLogger = loggerFactory.CreateBootstrapLogger();
+
+        try
+        {
+            var options = serviceProvider.GetRequiredService<CommandLineOptions>();
+            var logger = loggerFactory.CreateLogger();
+
+            //
+            // help does not require IStore and '-s' switch, so we handle it specifically
+            //
+            if (options.Command == Command.Help)
+            {
+                Help(bootstrapLogger);
+                return ExitCode.HelpDisplayed;
+            }
+
+            options.Validate();
+
+            IRunnerStrategy strategy = options.Command switch
+            {
+                Command.Scan => serviceProvider.GetRequiredService<Func<ScanStrategy>>()(),
+                Command.Compare => serviceProvider.GetRequiredService<CompareStrategy>(),
+                Command.List => serviceProvider.GetRequiredService<ListStrategy>(),
+                Command.Delete => throw new NotImplementedException(),
+                Command.Clear => throw new NotImplementedException(),
+                _ => throw new NotSupportedException(),
+            };
+
+            int exitCode = strategy.Run();
+            return exitCode;
+        }
+        catch (CommandLineParseException commandLineParseException)
+        {
+            bootstrapLogger.Error(commandLineParseException.Message);
+            return ExitCode.InvalidCommandLine;
+        }
+        catch (FatalExitException fatalExitException)
+        {
+            bootstrapLogger.Error(fatalExitException.Message);
+            return fatalExitException.ExitCode;
+        }
+        catch (Exception exception)
+        {
+            bootstrapLogger.Error("Fatal: {0}", exception);
+            return ExitCode.GenericError;
+        }
+    }
+
     private static ServiceProvider CreateAndBuildServiceProvider(string[] args)
     {
         var services = new ServiceCollection();
@@ -79,61 +132,6 @@ internal static class Program
 
         var provider = services.BuildServiceProvider();
         return provider;
-    }
-
-    private static int Main(string[] args)
-    {
-        var serviceProvider = CreateAndBuildServiceProvider(args);
-
-        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        var bootstrapLogger = loggerFactory.CreateBootstrapLogger();
-
-        try
-        {
-            var options = serviceProvider.GetRequiredService<CommandLineOptions>();
-            var logger = loggerFactory.CreateLogger();
-
-            //
-            // help does not require IStore and '-s' switch, so we handle it specifically
-            //
-            if (options.Command == Command.Help)
-            {
-                Help(bootstrapLogger);
-                return ExitCode.HelpDisplayed;
-            }
-
-            options.Validate();
-
-            var store = serviceProvider.GetRequiredService<IStore>();
-
-            IRunnerStrategy strategy = options.Command switch
-            {
-                Command.Scan => serviceProvider.GetRequiredService<Func<ScanStrategy>>()(),
-                Command.Compare => serviceProvider.GetRequiredService<CompareStrategy>(),
-                Command.List => serviceProvider.GetRequiredService<ListStrategy>(),
-                Command.Delete => throw new NotImplementedException(),
-                Command.Clear => throw new NotImplementedException(),
-                _ => throw new NotSupportedException(),
-            };
-
-            int exitCode = strategy.Run();
-            return exitCode;
-        }
-        catch (CommandLineParseException commandLineParseException)
-        {
-            bootstrapLogger.Error(commandLineParseException.Message);
-            return ExitCode.InvalidCommandLine;
-        }
-        catch (FatalExitException fatalExitException)
-        {
-            bootstrapLogger.Error(fatalExitException.Message);
-            return fatalExitException.ExitCode;
-        }
-        catch (Exception exception)
-        {
-            bootstrapLogger.Error("Fatal: {0}", exception);
-            return ExitCode.GenericError;
-        }
     }
 
     private static void Help(ILogger logger)
