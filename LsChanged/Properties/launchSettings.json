@@ -11,6 +11,10 @@
     "LsChanged compare": {
       "commandName": "Project",
       "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare c:\\temp\\compare.txt -cm lp -rp C:\\"
+    },
+    "LsChanged list": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore list -v"
     }
   }
 }

@@ -43,7 +43,7 @@ internal static class Program
                     break;
 
                 case Command.List:
-                    throw new NotImplementedException();
+                    List(logger, store);
                     break;
 
                 case Command.Delete:
@@ -112,7 +112,28 @@ internal static class Program
         Console.WriteLine($"FileStates: {options.CompareFileStates}");
         Console.WriteLine($"RelativePath: {options.CompareRelativePath}");
 
+        //if (options.CompareMode == LsChanged.Compare.CompareMode.SpecifiedSnapshots)
+        //{
+        //    var newSnapshot = store.GetByOrdinal(options.NewCompareSnapshot);
+        //    var oldSnapshot = store.GetByOrdinal(options.OldCompareSnapshot);
+        //}
+
         throw new NotImplementedException();
+    }
+
+    private static void List(ILogger logger, IStore store)
+    {
+        var entries = store.ListAll().ToList();
+        
+        logger.Debug("     # Id");
+        logger.Debug("------ --------------------------------------------------");
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            logger.Info("{0,6} {1}", i, entries[i].Id);
+        }
+
+        logger.Debug(System.Environment.NewLine + "Total: {0}", entries.Count);
     }
 
     private static void Help(ILogger logger)

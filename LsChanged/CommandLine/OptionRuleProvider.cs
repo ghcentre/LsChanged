@@ -100,12 +100,16 @@ internal class OptionRuleProvider
 
 	            #endregion
 
+                #region List
 
-                new OptionRule("list", 0,
+		        new OptionRule("list", 0,
                     (o, _) =>
                     {
-                        throw new NotImplementedException();
+                        o.SetCommand(Command.List);
                     }),
+
+	            #endregion
+
 
                 new OptionRule("delete", 1,
                     (o, a) =>

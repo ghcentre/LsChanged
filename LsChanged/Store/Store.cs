@@ -63,7 +63,8 @@ internal class Store : IStore
 
     public IEnumerable<IStoreEntry> ListAll()
     {
-        var files = Directory.GetFiles(_pathToStore);
+        var files = Directory.GetFiles(_pathToStore)
+            .Where(x => Path.GetFileName(x) != _markerFileName);
 
         var entries = files.Select(x => _storeEntryFactory(x)).ToList();
         return entries;
@@ -74,6 +75,15 @@ internal class Store : IStore
         ArgumentNullException.ThrowIfNull(storeEntry);
 
         var result = _reader.Read(storeEntry);
+        return result;
+    }
+
+    public IStoreRecord? GetByOrdinal(int ordinal)
+    {
+        var storeEntries = ListAll();
+        var storeEntry = storeEntries.Skip(ordinal).FirstOrDefault();
+
+        var result = storeEntry != null ? Get(storeEntry) : null;
         return result;
     }
 

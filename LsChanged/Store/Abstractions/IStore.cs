@@ -6,6 +6,8 @@ internal interface IStore
 
     IStoreRecord Get(IStoreEntry storeEntry);
 
+    IStoreRecord? GetByOrdinal(int ordinal);
+
     IStoreEntry Add(IStoreRecord storeRecord);
 
     bool Remove(IStoreEntry storeEntry);
