@@ -16,9 +16,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
 
     public FileInfoCollector(ILogger logger, FollowSymlinksMode followSymlinksMode)
     {
-        ArgumentNullException.ThrowIfNull(logger);
         _logger = logger;
-
         _followSymlinksMode = followSymlinksMode;
     }
 

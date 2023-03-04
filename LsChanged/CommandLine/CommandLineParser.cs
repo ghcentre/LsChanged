@@ -9,10 +9,7 @@ internal class CommandLineParser
 
     public CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
     {
-        ArgumentNullException.ThrowIfNull(rules);
         _rules = rules.ToDictionary(x => x.Prefix, x => x).AsReadOnly();
-
-        ArgumentNullException.ThrowIfNull(emptyCommandLine);
         _emptyCommandLine = emptyCommandLine;
     }
 

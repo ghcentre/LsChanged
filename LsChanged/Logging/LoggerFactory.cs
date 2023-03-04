@@ -8,7 +8,6 @@ internal class LoggerFactory : ILoggerFactory
 
     public LoggerFactory(Func<CommandLineOptions> commandLineOptionsFactory)
     {
-        ArgumentNullException.ThrowIfNull(commandLineOptionsFactory);
         _commandLineOptionsFactory = commandLineOptionsFactory;
     }
 

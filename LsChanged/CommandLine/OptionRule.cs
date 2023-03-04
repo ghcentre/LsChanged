@@ -6,12 +6,8 @@ internal sealed record OptionRule
                       int numArguments,
                       Action<CommandLineOptions, IEnumerable<string>> setOption)
     {
-        ArgumentException.ThrowIfNullOrEmpty(prefix);
         Prefix = prefix;
-
         NumArguments = Math.Max(numArguments, 0);
-
-        ArgumentNullException.ThrowIfNull(setOption);
         SetOption = setOption;
     }
 
