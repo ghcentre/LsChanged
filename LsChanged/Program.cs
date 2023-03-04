@@ -6,6 +6,7 @@ using LsChanged.ProgramRunner;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Reflection;
 
 namespace LsChanged;
@@ -35,15 +36,8 @@ internal static class Program
 
             options.Validate();
 
-            IRunnerStrategy strategy = options.Command switch
-            {
-                Command.Scan => serviceProvider.GetRequiredService<Func<ScanStrategy>>()(),
-                Command.Compare => serviceProvider.GetRequiredService<CompareStrategy>(),
-                Command.List => serviceProvider.GetRequiredService<ListStrategy>(),
-                Command.Delete => throw new NotImplementedException(),
-                Command.Clear => throw new NotImplementedException(),
-                _ => throw new NotSupportedException(),
-            };
+            var strategyFactory = serviceProvider.GetRequiredService<Func<IRunnerStrategy>>();
+            var strategy = strategyFactory();
 
             int exitCode = strategy.Run();
             return exitCode;
@@ -114,21 +108,28 @@ internal static class Program
                 o =>
                 new FileInfoCollector(sp.GetRequiredService<ILogger>(), o.FollowSymlinksMode)));
 
+        services.AddTransient<ScanStrategy>();
+        services.AddTransient<ListStrategy>();
+        services.AddTransient<CompareStrategy>();
+
         services.AddSingleton(
-            sp => new Func<ScanStrategy>(
+            sp => new Func<IRunnerStrategy>(
                 () =>
                 {
-                    var instance = new ScanStrategy(
-                        sp.GetRequiredService<ILogger>(),
-                        sp.GetRequiredService<CommandLineOptions>(),
-                        sp.GetRequiredService<IStore>(),
-                        sp.GetRequiredService<Func<CommandLineOptions, IFileInfoCollector>>(),
-                        sp.GetRequiredService<IStoreRecordFactory>(),
-                        sp.GetRequiredService<ICurrentTimeProvider>());
-                    return instance;
-                }));
-        services.AddTransient<ListStrategy>(); // TODO: replace with Func for stragegy impl
-        services.AddTransient<CompareStrategy>(); // TODO: replace with Func for stragegy impl
+                    var options = sp.GetRequiredService<CommandLineOptions>();
+                    var command = options.Command;
+                    IRunnerStrategy strategy = command switch
+                    {
+                        Command.Scan => sp.GetRequiredService<ScanStrategy>(),
+                        Command.Compare => sp.GetRequiredService<CompareStrategy>(),
+                        Command.List => sp.GetRequiredService<ListStrategy>(),
+                        Command.Delete => throw new NotImplementedException(),
+                        Command.Clear => throw new NotImplementedException(),
+                        _ => throw new NotSupportedException(),
+                    };
+                    return strategy;
+                })
+            );
 
         var provider = services.BuildServiceProvider();
         return provider;
