@@ -112,11 +112,11 @@ internal static class Program
         Console.WriteLine($"FileStates: {options.CompareFileStates}");
         Console.WriteLine($"RelativePath: {options.CompareRelativePath}");
 
-        //if (options.CompareMode == LsChanged.Compare.CompareMode.SpecifiedSnapshots)
-        //{
-        //    var newSnapshot = store.GetByOrdinal(options.NewCompareSnapshot);
-        //    var oldSnapshot = store.GetByOrdinal(options.OldCompareSnapshot);
-        //}
+        if (options.CompareMode == LsChanged.Compare.CompareMode.SpecifiedSnapshots)
+        {
+            var newSnapshot = store.GetByOrdinal(options.NewCompareSnapshot!.Value);
+            var oldSnapshot = store.GetByOrdinal(options.OldCompareSnapshot!.Value);
+        }
 
         throw new NotImplementedException();
     }

@@ -10,7 +10,7 @@
     },
     "LsChanged compare": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare c:\\temp\\compare.txt -cm lp -rp C:\\"
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare c:\\temp\\compare.txt -cm 0,10 -rp C:\\"
     },
     "LsChanged list": {
       "commandName": "Project",

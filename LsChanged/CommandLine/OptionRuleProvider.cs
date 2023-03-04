@@ -61,6 +61,8 @@ internal class OptionRuleProvider
                                 .ToArray();
                             if (snapshotOrdinalStrings.Length == 2)
                             {
+                                o.CompareMode = CompareMode.SpecifiedSnapshots;
+
                                 o.NewCompareSnapshot = int.Parse(snapshotOrdinalStrings[0]);
                                 o.OldCompareSnapshot = int.Parse(snapshotOrdinalStrings[1]);
 
