@@ -1,4 +1,4 @@
-﻿Usage: lschanged command [args] [options] 
+﻿Usage: lschanged command [args] [options]
 
 Common options:
     -s path     Sets store path. The path must be absolute path.
