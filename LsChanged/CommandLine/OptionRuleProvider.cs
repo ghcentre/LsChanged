@@ -27,67 +27,18 @@ internal class OptionRuleProvider
 
         #region Compare
 
-        new OptionRule("compare", 1,
+        new OptionRule("compare", 3,
             (o, a) =>
             {
                 o.SetCommand(Command.Compare);
-                o.CompareOutputFile = a.First();
-            }),
 
-        new OptionRule("-cm", 1,
-            (o, a) =>
-            {
-                string modeString = a.First();
-                if (modeString == "lp")
-                {
-                    o.CompareMode = CompareMode.LastPrevious;
-                    return;
-                }
-                if (modeString == "lf")
-                {
-                    o.CompareMode = CompareMode.LastFirst;
-                    return;
-                }
+                string compareMode = a.First();
+                SetCompareMode(o, compareMode);
 
-                if (modeString.Count(c => c == ',') == 1)
-                {
-                    string[] snapshotOrdinalStrings = modeString
-                        .Split(',')
-                        .Where(x => x.All(c => char.IsAsciiDigit(c)))
-                        .ToArray();
-                    if (snapshotOrdinalStrings.Length == 2)
-                    {
-                        o.CompareMode = CompareMode.SpecifiedSnapshots;
+                string compareStates = a.Skip(1).First();
+                SetCompareStates(o, compareStates);
 
-                        o.NewCompareSnapshot = int.Parse(snapshotOrdinalStrings[0]);
-                        o.OldCompareSnapshot = int.Parse(snapshotOrdinalStrings[1]);
-
-                        return;
-                    }
-                }
-                throw new CommandLineParseException(
-                    "Compare mode option must be lp, lf, or exactly two numeric arguments separated by comma.");
-            }),
-
-        new OptionRule("-st", 1,
-            (o, a) =>
-            {
-                var fileStates = CompareFileStates.None;
-                string[] states = a.First().Split(",");
-                foreach (string stateString in states)
-                {
-                    var state = stateString switch
-                    {
-                        "a" => CompareFileStates.Added,
-                        "m" => CompareFileStates.Modified,
-                        "u" => CompareFileStates.Unmodified,
-                        "d" => CompareFileStates.Deleted,
-                        _ => throw new CommandLineParseException(
-                                "Compare file states requires any combination of a,m,u,d in any order.")
-                    };
-                    fileStates |= state;
-                }
-                o.CompareFileStates = fileStates;
+                o.CompareOutputFile = a.Skip(2).First();
             }),
 
         new OptionRule("-rp", 1,
@@ -156,6 +107,68 @@ internal class OptionRuleProvider
                 o.Verbose = true;
             }),
     };
+
+    #region Compare mode Argument Helpers
+
+    private static void SetCompareMode(CommandLineOptions o, string modeString)
+    {
+        o.NewCompareSnapshot = o.OldCompareSnapshot = null;
+
+        if (modeString == "lp")
+        {
+            o.CompareMode = CompareMode.LastPrevious;
+            return;
+        }
+
+        if (modeString == "lf")
+        {
+            o.CompareMode = CompareMode.LastFirst;
+            return;
+        }
+
+        if (modeString.Count(c => c == ',') == 1)
+        {
+            string[] snapshotOrdinalStrings = modeString
+                .Split(',')
+                .Where(x => x.All(c => char.IsAsciiDigit(c)))
+                .ToArray();
+            if (snapshotOrdinalStrings.Length == 2)
+            {
+                o.CompareMode = CompareMode.SpecifiedSnapshots;
+
+                o.NewCompareSnapshot = int.Parse(snapshotOrdinalStrings[0]);
+                o.OldCompareSnapshot = int.Parse(snapshotOrdinalStrings[1]);
+
+                return;
+            }
+        }
+        throw new CommandLineParseException(
+            "Compare mode argument must be lp, lf, or exactly two numbers separated by comma.");
+    }
+
+    private static void SetCompareStates(CommandLineOptions o, string compareStates)
+    {
+        var fileStates = CompareFileStates.None;
+
+        string[] states = compareStates.Split(",");
+
+        foreach (string stateString in states)
+        {
+            var state = stateString switch
+            {
+                "a" => CompareFileStates.Added,
+                "m" => CompareFileStates.Modified,
+                "u" => CompareFileStates.Unmodified,
+                "d" => CompareFileStates.Deleted,
+                _ => throw new CommandLineParseException(
+                        "Compare file states requires any combination of a,m,u,d in any order.")
+            };
+            fileStates |= state;
+        }
+        o.CompareFileStates = fileStates;
+    }
+
+    #endregion
 
     public static IEnumerable<OptionRule> Rules => _rules;
 }

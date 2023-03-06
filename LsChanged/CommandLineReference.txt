@@ -31,12 +31,9 @@ Commands:
                 outputs file paths to the specified file.
 
                 Arguments:
-                    file        Outputs file paths to file specified.
-
-                Options
-                    -cm mode    Specifies compare mode:
+                    mode        Specifies compare mode:
                                     lp  - compare last and previous
-                                          snapshots (default)
+                                          snapshots
                                     lf  - compare last and first
                                           snapshots
                                     n,m - compare snapshots with
@@ -50,22 +47,26 @@ Commands:
 
                                 For n,m mode, compare fails if one of
                                 specified snapshots does not exist.
-                                    
-                    -st states  Outputs files with the following
+
+                    states      Outputs files with the following
                                 states (comma-separated):
                                     a - added files
                                     m - modified files
                                     u - unmodified files
                                     d - deleted files
-                                Default is a,m
 
-                    -rp folder  Outputs file paths relative to the
+                    file        Outputs file paths to file specified.
+                                File encoding is UTF-8.
+
+                Options
+                    -rp folder  Outputs file paths relative
+                                (case-sensitive comparation) to the
                                 specified folder. Folder must be an
                                 absolute path. The folder may not
                                 actually exist.
 
                 Example:
-                    lschanged compare C:\changed.txt -cm lf -st n,m,u,d -rp "C:\Starting Path" -s C:\Mystore
+                    lschanged compare lp n,m C:\changed.txt -rp "C:\Starting Path" -s C:\Mystore
 
     list        Lists snapshots in the store.
 
