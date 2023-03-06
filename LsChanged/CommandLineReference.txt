@@ -28,7 +28,7 @@ Commands:
                     lschanged scan "C:\Starting Path" -fs 1 -s C:\Mystore
 
     compare     Compares the difference between two snapshots and
-                outputs file paths to the specified file.
+                outputs file paths to the specified list file.
 
                 Arguments:
                     mode        Specifies compare mode:
@@ -55,7 +55,7 @@ Commands:
                                     u - unmodified files
                                     d - deleted files
 
-                    file        Outputs file paths to file specified.
+                    listfile    Outputs file paths to listfile specified.
                                 File encoding is UTF-8.
 
                 Options

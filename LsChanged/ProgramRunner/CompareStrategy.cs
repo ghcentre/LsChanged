@@ -47,7 +47,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
 
         SaveOutput(rootStripped);
 
-        return ExitCode.Success;
+        return rootStripped.Any() ? ExitCode.Success : ExitCode.NoFilesListed;
     }
 
     #region ctor helpers
