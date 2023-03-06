@@ -6,5 +6,10 @@
             : base($"Snapshot #{ordinal} does not exist.")
         {
         }
+
+        public SnapshotNotFoundException(string message)
+            : base(message)
+        {
+        }
     }
 }

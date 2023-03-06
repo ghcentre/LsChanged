@@ -17,4 +17,18 @@ internal sealed class FileStatus
     public int Attributes { get; }
 
     public int Mode { get; }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is FileStatus status &&
+               Size == status.Size &&
+               LastWriteUtc == status.LastWriteUtc &&
+               Attributes == status.Attributes &&
+               Mode == status.Mode;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Size, LastWriteUtc, Attributes, Mode);
+    }
 }
