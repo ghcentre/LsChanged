@@ -59,7 +59,7 @@ internal static class Program
         }
         catch (Exception exception)
         {
-            bootstrapLogger.Error("Fatal: {0}", exception);
+            bootstrapLogger.Error("Fatal: {0}", exception.Message);
             return ExitCode.GenericError;
         }
     }
