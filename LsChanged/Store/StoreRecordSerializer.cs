@@ -1,5 +1,6 @@
 ﻿using LsChanged.Exceptions;
 using LsChanged.Store.Abstractions;
+using LsChanged.Store.Serialization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -8,6 +9,13 @@ namespace LsChanged.Store;
 
 internal class StoreRecordSerializer : IStoreRecordSerializer
 {
+    private static readonly JsonSerializerOptions _serializerOptions = new()
+    {
+        TypeInfoResolver = StoreRecordSerializerContext.Default,
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+        WriteIndented = true
+    };
+
     public string Serialize(IStoreRecord storeRecord)
     {
         ArgumentNullException.ThrowIfNull(storeRecord);
@@ -17,12 +25,7 @@ internal class StoreRecordSerializer : IStoreRecordSerializer
             throw new StoreEntrySerializationException("Unsupported Store Record implementation.");
         }
 
-        var options = new JsonSerializerOptions()
-        {
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            WriteIndented = true
-        };
-        string result = JsonSerializer.Serialize(recordImpl, options);
+        string result = JsonSerializer.Serialize(recordImpl, typeof(StoreRecord), _serializerOptions);
 
         return result;
     }
