@@ -121,6 +121,11 @@ internal class Store : IStore
     {
         try
         {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             var files = Directory.GetFiles(directory);
         }
         catch (Exception exception)
