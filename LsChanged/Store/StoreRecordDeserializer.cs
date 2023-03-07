@@ -1,5 +1,6 @@
 ﻿using LsChanged.Exceptions;
 using LsChanged.Store.Abstractions;
+using LsChanged.Store.Serialization;
 using System.Text.Json;
 
 namespace LsChanged.Store;
@@ -12,7 +13,7 @@ internal class StoreRecordDeserializer : IStoreRecordDeserializer
 
         try
         {
-            var result = JsonSerializer.Deserialize<StoreRecord>(serialized)
+            var result = JsonSerializer.Deserialize(serialized, StoreRecordSerializerContext.Default.StoreRecord)
                          ?? throw new StoreEntrySerializationException("Unable to deserialize Store Record.");
             return result;
         }
