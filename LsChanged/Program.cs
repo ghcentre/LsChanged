@@ -146,8 +146,15 @@ internal static class Program
 
     private static void Help(ILogger logger)
     {
-        const string resourceName = "LsChanged.CommandLineReference.txt";
         var assembly = Assembly.GetExecutingAssembly();
+        var version = assembly.GetName().Version;
+        
+        logger.Info("LsChanged {0}", version);
+        logger.Info("Copyright (c) 2023 George Harder's Centre (https://ghcentre.com)");
+        logger.Info("Creates filesystem snaphots. Compares snapshots and lists files changed.");
+        logger.Info(string.Empty);
+
+        const string resourceName = "LsChanged.CommandLineReference.txt";
 
         using var stream = assembly.GetManifestResourceStream(resourceName)
                            ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");

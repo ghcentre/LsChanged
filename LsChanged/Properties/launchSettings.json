@@ -23,6 +23,9 @@
     "LsChanged delete": {
       "commandName": "Project",
       "commandLineArgs": "-s C:\\TEMP\\LsChangedStore delete last"
+    },
+    "LsChanged help": {
+      "commandName": "Project"
     }
   }
 }
