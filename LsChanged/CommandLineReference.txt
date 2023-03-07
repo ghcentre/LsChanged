@@ -56,7 +56,10 @@ Commands:
                                     d - deleted files
 
                     listfile    Outputs file paths to listfile specified.
-                                File encoding is UTF-8.
+                                File encoding is UTF-8. If listfile name
+                                is '-' (dash), standard output stream is
+                                used for output. Output encoding is set
+                                by the operating system.
 
                 Options
                     -rp folder  Outputs file paths relative

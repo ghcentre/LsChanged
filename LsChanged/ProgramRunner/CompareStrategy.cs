@@ -10,6 +10,8 @@ namespace LsChanged.ProgramRunner;
 
 internal sealed class CompareStrategy : IRunnerStrategy
 {
+    private const string _standardOutputFileName = "-";
+
     private readonly ILogger _logger;
     private readonly CommandLineOptions _options;
     private readonly IStore _store;
@@ -207,7 +209,16 @@ internal sealed class CompareStrategy : IRunnerStrategy
 
     private void SaveOutput(IEnumerable<string> lines)
     {
-        File.WriteAllLines(_options.CompareOutputFile!, lines, Encoding.UTF8);
+        if (_options.CompareOutputFile != _standardOutputFileName)
+        {
+            File.WriteAllLines(_options.CompareOutputFile!, lines, Encoding.UTF8);
+            return;
+        }
+
+        foreach (var line in lines)
+        {
+            Console.Out.WriteLine(line);
+        }
     }
 
     private void LogTotals()
