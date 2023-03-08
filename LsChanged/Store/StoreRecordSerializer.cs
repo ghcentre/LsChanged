@@ -1,6 +1,7 @@
 ﻿using LsChanged.Exceptions;
 using LsChanged.Store.Abstractions;
 using LsChanged.Store.Serialization;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -16,7 +17,7 @@ internal class StoreRecordSerializer : IStoreRecordSerializer
         WriteIndented = true
     };
 
-    public string Serialize(IStoreRecord storeRecord)
+    public byte[] Serialize(IStoreRecord storeRecord)
     {
         ArgumentNullException.ThrowIfNull(storeRecord);
 
@@ -25,8 +26,9 @@ internal class StoreRecordSerializer : IStoreRecordSerializer
             throw new StoreEntrySerializationException("Unsupported Store Record implementation.");
         }
 
-        string result = JsonSerializer.Serialize(recordImpl, typeof(StoreRecord), _serializerOptions);
-
+        string resultString = JsonSerializer.Serialize(recordImpl, typeof(StoreRecord), _serializerOptions);
+        
+        byte[] result = Encoding.UTF8.GetBytes(resultString);
         return result;
     }
 }

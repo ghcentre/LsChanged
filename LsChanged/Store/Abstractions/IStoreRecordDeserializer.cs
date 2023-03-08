@@ -2,5 +2,5 @@
 
 internal interface IStoreRecordDeserializer
 {
-    IStoreRecord Deserialize(string serialized);
+    IStoreRecord Deserialize(byte[] serialized);
 }

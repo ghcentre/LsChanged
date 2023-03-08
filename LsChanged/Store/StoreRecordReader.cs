@@ -22,19 +22,19 @@ internal class StoreRecordReader : IStoreRecordReader
         bool useCompression = entry.Id.EndsWith(_gzipExtension);
         string filePath = entry.Id;
 
-        string serialized = useCompression ? ReadCompressed(filePath) : ReadUncompressed(filePath);
+        byte[] serialized = useCompression ? ReadCompressed(filePath) : ReadUncompressed(filePath);
 
         var result = _deserializer.Deserialize(serialized);
         return result;
     }
 
 
-    private static string ReadUncompressed(string filePath)
+    private static byte[] ReadUncompressed(string filePath)
     {
-        return File.ReadAllText(filePath);
+        return File.ReadAllBytes(filePath);
     }
 
-    private static string ReadCompressed(string filePath)
+    private static byte[] ReadCompressed(string filePath)
     {
         using var fileStream = File.OpenRead(filePath);
         using var decompressedStream = new MemoryStream();
@@ -42,9 +42,8 @@ internal class StoreRecordReader : IStoreRecordReader
         decompressor.CopyTo(decompressedStream);
 
         decompressedStream.Seek(0, SeekOrigin.Begin);
-        var bytes = decompressedStream.ToArray();
 
-        string result = Encoding.UTF8.GetString(bytes);
+        var result = decompressedStream.ToArray();
         return result;
     }
 }

@@ -2,5 +2,5 @@
 
 internal interface IStoreRecordSerializer
 {
-    string Serialize(IStoreRecord storeRecord);
+    byte[] Serialize(IStoreRecord storeRecord);
 }

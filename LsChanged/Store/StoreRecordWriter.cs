@@ -27,9 +27,7 @@ internal class StoreRecordWriter : IStoreRecordWriter
         }
 
         string filePath = fileName;
-        string serialized = _serializer.Serialize(storeRecord);
-
-        var serializedBytes = Encoding.UTF8.GetBytes(serialized);
+        byte[] serializedBytes = _serializer.Serialize(storeRecord);
 
         using var originalStream = new MemoryStream(serializedBytes);
         using var fileStream = File.Create(filePath);
