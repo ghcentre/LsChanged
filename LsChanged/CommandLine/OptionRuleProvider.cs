@@ -150,7 +150,9 @@ internal class OptionRuleProvider
     {
         var fileStates = CompareFileStates.None;
 
-        string[] states = compareStates.Split(",");
+        var states = compareStates.Contains(',')
+                        ? compareStates.Split(",")
+                        : compareStates.ToCharArray().Select(x => new string(x, 1));
 
         foreach (string stateString in states)
         {

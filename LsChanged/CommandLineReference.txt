@@ -49,7 +49,7 @@ Commands:
                                 specified snapshots does not exist.
 
                     states      Outputs files with the following
-                                states (comma-separated):
+                                states (states may be comma-separated):
                                     a - added files
                                     m - modified files
                                     u - unmodified files
