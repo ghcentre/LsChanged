@@ -154,7 +154,7 @@ internal static class Program
         logger.Info("Creates filesystem snaphots. Compares snapshots and lists files changed.");
         logger.Info(string.Empty);
 
-        const string resourceName = "LsChanged.CommandLineReference.txt";
+        const string resourceName = "lschanged.CommandLineReference.txt";
 
         using var stream = assembly.GetManifestResourceStream(resourceName)
                            ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");
