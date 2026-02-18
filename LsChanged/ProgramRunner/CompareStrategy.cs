@@ -125,7 +125,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
     {
         var paths = _includeAdded
             ? newSnapshot.Files.Keys
-            : Enumerable.Empty<string>();
+            : [];
 
         var result = paths.ToList();
         result.Sort();
@@ -244,16 +244,10 @@ internal sealed class CompareStrategy : IRunnerStrategy
         }
     }
 
-    private class SeenState
+    private class SeenState(FileStatus fileStatus, bool seen)
     {
-        public SeenState(FileStatus fileStatus, bool seen)
-        {
-            FileStatus = fileStatus;
-            Seen = seen;
-        }
+        public FileStatus FileStatus { get; } = fileStatus;
 
-        public FileStatus FileStatus { get; }
-
-        public bool Seen { get; set; }
+        public bool Seen { get; set; } = seen;
     }
 }

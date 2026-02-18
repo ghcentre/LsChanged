@@ -3,21 +3,12 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.ProgramRunner;
 
-internal class ClearStrategy : IRunnerStrategy
+internal class ClearStrategy(ILogger logger, IStore store) : IRunnerStrategy
 {
-    private readonly ILogger _logger;
-    private readonly IStore _store;
-
-    public ClearStrategy(ILogger logger, IStore store)
-    {
-        _logger = logger;
-        _store = store;
-    }
-
     public int Run()
     {
-        _store.Clear();
-        _logger.Debug("Store cleared.");
+        store.Clear();
+        logger.Debug("Store cleared.");
 
         return ExitCode.Success;
     }

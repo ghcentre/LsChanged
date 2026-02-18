@@ -1,22 +1,14 @@
 ﻿namespace LsChanged.Collector;
 
-internal sealed class FileStatus
+internal sealed class FileStatus(long size, DateTime lastWriteUtc, int attributes, int mode)
 {
-    public FileStatus(long size, DateTime lastWriteUtc, int attributes, int mode)
-    {
-        Size = size;
-        LastWriteUtc = lastWriteUtc;
-        Attributes = attributes;
-        Mode = mode;
-    }
+    public long Size { get; } = size;
 
-    public long Size { get; }
+    public DateTime LastWriteUtc { get; } = lastWriteUtc;
 
-    public DateTime LastWriteUtc { get; }
+    public int Attributes { get; } = attributes;
 
-    public int Attributes { get; }
-
-    public int Mode { get; }
+    public int Mode { get; } = mode;
 
     public override bool Equals(object? obj)
     {

@@ -150,8 +150,8 @@ internal static class Program
         var version = assembly.GetName().Version;
         
         logger.Info("LsChanged {0}", version);
-        logger.Info("Copyright (c) 2023 George Harder's Centre (https://ghcentre.com)");
-        logger.Info("Creates filesystem snaphots. Compares snapshots and lists files changed.");
+        logger.Info("Copyright (c) 2023-2026 George Harder's Centre (https://ghcentre.com)");
+        logger.Info("Creates filesystem metadata snapshots. Compares snapshots and lists files changed.");
         logger.Info(string.Empty);
 
         const string resourceName = "lschanged.CommandLineReference.txt";

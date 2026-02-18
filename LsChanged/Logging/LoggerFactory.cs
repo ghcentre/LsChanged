@@ -2,18 +2,11 @@
 
 namespace LsChanged.Logging;
 
-internal class LoggerFactory : ILoggerFactory
+internal class LoggerFactory(Func<CommandLineOptions> commandLineOptionsFactory) : ILoggerFactory
 {
-    private readonly Func<CommandLineOptions> _commandLineOptionsFactory;
-
-    public LoggerFactory(Func<CommandLineOptions> commandLineOptionsFactory)
-    {
-        _commandLineOptionsFactory = commandLineOptionsFactory;
-    }
-
     public ILogger CreateLogger()
     {
-        var options = _commandLineOptionsFactory();
+        var options = commandLineOptionsFactory();
         var instance = new ConsoleLogger(options.Verbose);
         return instance;
     }

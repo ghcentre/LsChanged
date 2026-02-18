@@ -1,6 +1,6 @@
 ﻿namespace LsChanged.Logging;
 
-internal class ConsoleLogger : ILogger
+internal class ConsoleLogger(bool verbose) : ILogger
 {
     private enum LogLevel
     {
@@ -11,12 +11,7 @@ internal class ConsoleLogger : ILogger
         Error = 5
     }
 
-    private readonly LogLevel _logLevel;
-
-    public ConsoleLogger(bool verbose)
-    {
-        _logLevel = verbose ? LogLevel.Debug : LogLevel.Info;
-    }
+    private readonly LogLevel _logLevel = verbose ? LogLevel.Debug : LogLevel.Info;
 
     public void Debug(string message) =>
         Print(LogLevel.Debug, message);

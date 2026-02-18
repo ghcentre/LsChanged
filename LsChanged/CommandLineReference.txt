@@ -1,5 +1,11 @@
 ﻿Usage: lschanged command [args] [options]
 
+    lschanged scan path [-fs mode] [-s path] [-v]
+    lschanged compare mode states listfile [-rp folder] [-s path] [-v]
+    lschanged list [-s path] [-v]
+    lschanged delete snapshot [-s path] [-v]
+    lschanged clear [-s path] [-v]
+
 Common options:
     -s path     Sets store path. The path must be absolute path.
 
@@ -63,13 +69,13 @@ Commands:
 
                 Options
                     -rp folder  Outputs file paths relative
-                                (case-sensitive comparation) to the
+                                (case-sensitive comparison) to the
                                 specified folder. Folder must be an
                                 absolute path. The folder may not
                                 actually exist.
 
                 Example:
-                    lschanged compare lp n,m C:\changed.txt -rp "C:\Starting Path" -s C:\Mystore
+                    lschanged compare lp a,m,d C:\changed.txt -rp "C:\Starting Path" -s C:\Mystore
 
     list        Lists snapshots in the store.
 

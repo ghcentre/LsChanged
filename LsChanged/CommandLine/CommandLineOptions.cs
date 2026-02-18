@@ -93,7 +93,7 @@ internal class CommandLineOptions
 
     private void ValidateFollowSymlinksMode()
     {
-        bool defined = Enum.IsDefined(typeof(FollowSymlinksMode), FollowSymlinksMode);
+        bool defined = Enum.IsDefined(FollowSymlinksMode);
         if (!defined)
         {
             throw new CommandLineParseException("Invalid follow symlinks mode.");

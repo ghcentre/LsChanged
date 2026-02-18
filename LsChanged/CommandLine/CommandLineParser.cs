@@ -2,16 +2,9 @@
 
 namespace LsChanged.CommandLine;
 
-internal class CommandLineParser
+internal class CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
 {
-    private readonly IReadOnlyDictionary<string, OptionRule> _rules;
-    private readonly Action<CommandLineOptions> _emptyCommandLine;
-
-    public CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
-    {
-        _rules = rules.ToDictionary(x => x.Prefix, x => x).AsReadOnly();
-        _emptyCommandLine = emptyCommandLine;
-    }
+    private readonly IReadOnlyDictionary<string, OptionRule> _rules = rules.ToDictionary(x => x.Prefix, x => x).AsReadOnly();
 
     public CommandLineOptions Parse(string[] args)
     {
@@ -19,7 +12,7 @@ internal class CommandLineParser
 
         if(args.Length == 0)
         {
-            _emptyCommandLine(options);
+            emptyCommandLine(options);
             return options;
         }
 

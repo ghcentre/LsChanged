@@ -3,22 +3,13 @@ using System.Diagnostics;
 
 namespace LsChanged.Collector;
 
-internal sealed class FileInfoCollector : IFileInfoCollector
+internal sealed class FileInfoCollector(ILogger logger, FollowSymlinksMode followSymlinksMode) : IFileInfoCollector
 {
-    private readonly Dictionary<string, FileStatus> _files = new();
-    private readonly HashSet<string> _visitedDirectories = new();
+    private readonly Dictionary<string, FileStatus> _files = [];
+    private readonly HashSet<string> _visitedDirectories = [];
 
     private int _totalFiles;
     private int _totalDirectories;
-
-    private readonly FollowSymlinksMode _followSymlinksMode;
-    private readonly ILogger _logger;
-
-    public FileInfoCollector(ILogger logger, FollowSymlinksMode followSymlinksMode)
-    {
-        _logger = logger;
-        _followSymlinksMode = followSymlinksMode;
-    }
 
     public IReadOnlyDictionary<string, FileStatus> Collect(string path)
     {
@@ -30,7 +21,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
 
         CollectRecursive(path);
 
-        _logger.Debug(
+        logger.Debug(
             Environment.NewLine + "Visited {0} folder(s). Collected {1} file(s).",
             _totalDirectories,
             _totalFiles);
@@ -41,7 +32,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
 
     private void CollectRecursive(string path)
     {
-        _logger.Debug(path);
+        logger.Debug(path);
 
         CollectFiles(path);
         _totalDirectories++;
@@ -50,7 +41,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
 
         foreach (string directoryPath in directories)
         {
-            if (_followSymlinksMode == FollowSymlinksMode.Follow)
+            if (followSymlinksMode == FollowSymlinksMode.Follow)
             {
                 CollectRecursive(directoryPath);
                 continue;
@@ -58,7 +49,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
 
             string? linkTarget = ResolveLinkTarget(directoryPath);
 
-            if (_followSymlinksMode == FollowSymlinksMode.Skip)
+            if (followSymlinksMode == FollowSymlinksMode.Skip)
             {
                 if (linkTarget == null)
                 {
@@ -68,7 +59,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
                 continue;
             }
 
-            Debug.Assert(_followSymlinksMode == FollowSymlinksMode.PreventRecursion);
+            Debug.Assert(followSymlinksMode == FollowSymlinksMode.PreventRecursion);
 
             string checkee = linkTarget ?? directoryPath;
             if (_visitedDirectories.Contains(checkee))
@@ -114,11 +105,15 @@ internal sealed class FileInfoCollector : IFileInfoCollector
         }
         catch (UnauthorizedAccessException)
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
         catch (DirectoryNotFoundException)
         {
-            return Enumerable.Empty<string>();
+            return [];
+        }
+        catch (IOException)
+        {
+            return [];
         }
     }
 
@@ -128,13 +123,11 @@ internal sealed class FileInfoCollector : IFileInfoCollector
         {
             var fileInfo = new FileInfo(filePath);
 
-            var status = new FileStatus(
+            return new FileStatus(
                 fileInfo.Length,
                 fileInfo.LastWriteTimeUtc,
                 (int)fileInfo.Attributes,
                 (int)fileInfo.UnixFileMode);
-
-            return status;
         }
         catch (UnauthorizedAccessException)
         {
@@ -159,11 +152,11 @@ internal sealed class FileInfoCollector : IFileInfoCollector
         }
         catch (UnauthorizedAccessException)
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
         catch (DirectoryNotFoundException)
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 
@@ -172,9 +165,7 @@ internal sealed class FileInfoCollector : IFileInfoCollector
         try
         {
             var link = Directory.ResolveLinkTarget(directoryPath, true) as DirectoryInfo;
-
-            string? result = link?.FullName;
-            return result;
+            return link?.FullName;
         }
         catch (DirectoryNotFoundException)
         {

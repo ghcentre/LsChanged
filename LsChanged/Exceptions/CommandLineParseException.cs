@@ -1,6 +1,4 @@
-﻿using LsChanged.CommandLine;
-
-namespace LsChanged.Exceptions;
+﻿namespace LsChanged.Exceptions;
 
 internal class CommandLineParseException : InvalidOperationException
 {
@@ -9,7 +7,7 @@ internal class CommandLineParseException : InvalidOperationException
     {
     }
 
-    public CommandLineParseException(string message,  Exception innerException)
+    public CommandLineParseException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

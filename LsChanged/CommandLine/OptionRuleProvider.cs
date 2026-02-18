@@ -6,18 +6,18 @@ namespace LsChanged.CommandLine;
 
 internal class OptionRuleProvider
 {
-    private static readonly OptionRule[] _rules = new[]
-    {
+    private static readonly OptionRule[] _rules =
+    [
         #region Scan
 
-        new OptionRule("scan", 1,
+        new("scan", 1,
             (o, a) =>
             {
                 o.SetCommand(Command.Scan);
                 o.ScanPath = a.First();
             }),
 
-        new OptionRule("-fs", 1,
+        new("-fs", 1,
             (o, a) =>
             {
                 o.FollowSymlinksMode = Enum.Parse<FollowSymlinksMode>(a.First());
@@ -27,7 +27,7 @@ internal class OptionRuleProvider
 
         #region Compare
 
-        new OptionRule("compare", 3,
+        new("compare", 3,
             (o, a) =>
             {
                 o.SetCommand(Command.Compare);
@@ -41,7 +41,7 @@ internal class OptionRuleProvider
                 o.CompareOutputFile = a.Skip(2).First();
             }),
 
-        new OptionRule("-rp", 1,
+        new("-rp", 1,
             (o, a) =>
             {
                 o.CompareRelativePath = a.First();
@@ -51,7 +51,7 @@ internal class OptionRuleProvider
 
         #region List
 
-		new OptionRule("list", 0,
+		new("list", 0,
             (o, _) =>
             {
                 o.SetCommand(Command.List);
@@ -61,7 +61,7 @@ internal class OptionRuleProvider
 
         #region Delete
 
-        new OptionRule("delete", 1,
+        new("delete", 1,
             (o, a) =>
             {
                 o.SetCommand(Command.Delete);
@@ -87,7 +87,7 @@ internal class OptionRuleProvider
 
         #region Clear
 
-        new OptionRule("clear", 0,
+        new("clear", 0,
             (o, _) =>
             {
                 o.SetCommand(Command.Clear);
@@ -95,18 +95,18 @@ internal class OptionRuleProvider
 
 	    #endregion
 
-        new OptionRule("-s", 1,
+        new("-s", 1,
             (o, a) =>
             {
                 o.StorePath = a.First();
             }),
 
-        new OptionRule("-v", 0,
+        new("-v", 0,
             (o, _) =>
             {
                 o.Verbose = true;
             }),
-    };
+    ];
 
     #region Compare mode Argument Helpers
 
