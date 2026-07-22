@@ -8,4 +8,4 @@
 [assembly: AssemblyCopyright("© 2023-2026 George Harder's Centre (https://ghcentre.com)")]
 [assembly: AssemblyCulture("")]
  
-[assembly: AssemblyVersion("1.1.*")]
+[assembly: AssemblyVersion("2.0.*")]
