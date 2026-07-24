@@ -1,14 +1,14 @@
 ﻿namespace LsChanged.Exceptions;
 
-internal class CommandLineParseException : InvalidOperationException
+internal sealed class CommandLineParseException : FatalExitException
 {
     public CommandLineParseException(string message)
-        : base(message)
+        : base(message, ProgramRunner.ExitCode.InvalidCommandLine)
     {
     }
 
     public CommandLineParseException(string message, Exception innerException)
-        : base(message, innerException)
+        : base(message, ProgramRunner.ExitCode.InvalidCommandLine, innerException)
     {
     }
 }
