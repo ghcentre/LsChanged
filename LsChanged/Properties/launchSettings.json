@@ -2,7 +2,7 @@
   "profiles": {
     "Linux (WSL)": {
       "commandName": "WSL2",
-      "commandLineArgs": "{OutDir}/LsChanged.dll /proc /mnt/c/TEMP/files-wsl.json"
+      "commandLineArgs": "{OutDir}/LsChanged.dll newignore /tmp/.lschangedignore"
     },
     "LsChanged scan": {
       "commandName": "Project",
@@ -26,6 +26,10 @@
     },
     "LsChanged help": {
       "commandName": "Project"
+    },
+    "LsChanged newignore": {
+      "commandName": "Project",
+      "commandLineArgs": "newignore C:\\TEMP\\.lschangedignore"
     }
   }
 }

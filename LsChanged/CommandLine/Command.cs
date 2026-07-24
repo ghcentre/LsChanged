@@ -7,5 +7,6 @@ internal enum Command
     List,
     Delete,
     Clear,
-    Help
+    Help,
+    NewIgnore,
 }

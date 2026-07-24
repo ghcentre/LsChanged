@@ -10,7 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="IgnoreFile.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Include="CommandLineReference.txt" />
+        <EmbeddedResource Include="IgnoreFile.txt" />
     </ItemGroup>
 
     <ItemGroup>

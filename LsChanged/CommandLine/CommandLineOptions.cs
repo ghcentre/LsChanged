@@ -52,10 +52,19 @@ internal class CommandLineOptions
 
     #endregion
 
+    #region NewIgnore
+
+    public string? IgnoreFilePath { get; set; } = default;
+
+    #endregion
+
     public void Validate()
     {
         switch (Command)
         {
+            case CommandLine.Command.Help:
+                return; // do not validate store path
+
             case CommandLine.Command.Scan:
                 ValidateScanPath();
                 ValidateFollowSymlinksMode();
@@ -73,6 +82,9 @@ internal class CommandLineOptions
 
             case CommandLine.Command.Clear:
                 break;
+
+            case CommandLine.Command.NewIgnore:
+                return; // do not validate store path
 
             default:
                 throw new CommandLineParseException("No command specified.");

@@ -6,7 +6,6 @@ using LsChanged.ProgramRunner;
 using LsChanged.Store;
 using LsChanged.Store.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace LsChanged;
 
@@ -22,35 +21,12 @@ internal static class Program
         try
         {
             var options = serviceProvider.GetRequiredService<CommandLineOptions>();
-
-            var logger = loggerFactory.CreateLogger();
-
-            //
-            // help does not require IStore and '-s' switch, so we handle it specifically
-            //
-            if (options.Command == Command.Help)
-            {
-                Help(bootstrapLogger);
-                return ExitCode.HelpDisplayed;
-            }
-
             options.Validate();
 
             var strategy = serviceProvider.GetRequiredService<IRunnerStrategy>();
 
             int exitCode = strategy.Run();
-
             return exitCode;
-        }
-        catch (CommandLineParseException commandLineParseException)
-        {
-            bootstrapLogger.Error(commandLineParseException.Message);
-            return ExitCode.InvalidCommandLine;
-        }
-        catch (SnapshotNotFoundException shapshotNotFoundException)
-        {
-            bootstrapLogger.Error(shapshotNotFoundException.Message);
-            return ExitCode.SnapshotNotFound;
         }
         catch (FatalExitException fatalExitException)
         {
@@ -117,11 +93,13 @@ internal static class Program
                 o =>
                 new FileInfoCollector(sp.GetRequiredService<ILogger>(), o.FollowSymlinksMode)));
 
+        services.AddTransient<HelpStrategy>();
         services.AddTransient<ScanStrategy>();
         services.AddTransient<ListStrategy>();
         services.AddTransient<CompareStrategy>();
         services.AddTransient<DeleteStrategy>();
         services.AddTransient<ClearStrategy>();
+        services.AddTransient<NewIgnoreStrategy>();
 
         services.AddTransient(
             sp =>
@@ -130,11 +108,13 @@ internal static class Program
                 var command = options.Command;
                 IRunnerStrategy strategy = command switch
                 {
+                    Command.Help => sp.GetRequiredService<HelpStrategy>(),
                     Command.Scan => sp.GetRequiredService<ScanStrategy>(),
                     Command.Compare => sp.GetRequiredService<CompareStrategy>(),
                     Command.List => sp.GetRequiredService<ListStrategy>(),
                     Command.Delete => sp.GetRequiredService<DeleteStrategy>(),
                     Command.Clear => sp.GetRequiredService<ClearStrategy>(),
+                    Command.NewIgnore => sp.GetRequiredService<NewIgnoreStrategy>(),
                     _ => throw new NotSupportedException(),
                 };
                 return strategy;
@@ -142,25 +122,5 @@ internal static class Program
 
         var provider = services.BuildServiceProvider();
         return provider;
-    }
-
-    private static void Help(ILogger logger)
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var version = assembly.GetName().Version;
-        
-        logger.Info("LsChanged {0}", version);
-        logger.Info("Copyright (c) 2023-2026 George Harder's Centre (https://ghcentre.com)");
-        logger.Info("Creates filesystem metadata snapshots. Compares snapshots and lists files changed.");
-        logger.Info(string.Empty);
-
-        const string resourceName = "lschanged.CommandLineReference.txt";
-
-        using var stream = assembly.GetManifestResourceStream(resourceName)
-                           ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");
-        using var reader = new StreamReader(stream);
-
-        string content = reader.ReadToEnd();
-        logger.Info(content);
     }
 }

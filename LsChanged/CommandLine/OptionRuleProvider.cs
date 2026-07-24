@@ -95,6 +95,18 @@ internal class OptionRuleProvider
 
 	    #endregion
 
+        #region NewIgnore
+
+        new("newignore", 1,
+            (o, a) =>
+            {
+                o.SetCommand(Command.NewIgnore);
+                o.IgnoreFilePath = a.First();
+            }),
+
+        #endregion
+
+
         new("-s", 1,
             (o, a) =>
             {
