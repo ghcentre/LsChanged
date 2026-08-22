@@ -1,7 +1,7 @@
 ﻿Usage: lschanged command [args] [options]
 
     lschanged scan path [-fs mode] [-s path] [-v]
-    lschanged compare mode states listfile [-rp folder] [-si ignorefile] [-s path] [-v]
+    lschanged compare mode states listfile [-rp folder] [-i ignorefile] [-s path] [-v]
     lschanged list [-s path] [-v]
     lschanged delete snapshot [-s path] [-v]
     lschanged clear [-s path] [-v]
@@ -11,38 +11,39 @@ Common options:
     -s path     Sets store path. The path must be absolute path.
 
     -v          Outputs actions perfomed to the standard output
-                (verbose mode). Error output is always directed to             
+                (verbose mode). Error output is always directed to
                 the standard error stream.
 
 Commands:
-    scan        Scans the folder specified and adds generated snaphot
-                to the store.
+    scan        Scans the folder specified and adds generated snaphot to
+                the store.
 
                 Arguments:
-                    path        The path to scan. Must be absolute
-                                path.
+                    path        The path to scan. Must be an absolute path.
 
                 Options:
                     -fs mode    Follow folder symlinks. Mode is one
                                 of the following:
-                                    0 - ignore folder symlinks
-                                        (default)
+                                    0 - ignore folder symlinks (default)
                                     1 - follow symlinks but try
                                         to prevent recursion
                                     2 - follow symlinks
 
                 Example:
+#if WINDOWS
                     lschanged scan "C:\Starting Path" -fs 1 -s C:\Mystore
+#endif
+#if !WINDOWS
+                    lschanged scan /staring/path -fs 1 -s /path/to/store
+#endif
 
-    compare     Compares the difference between two snapshots and
-                outputs file paths to the specified list file.
+    compare     Compares the difference between two snapshots and outputs
+                file paths to the specified list file.
 
                 Arguments:
                     mode        Specifies compare mode:
-                                    lp  - compare last and previous
-                                          snapshots
-                                    lf  - compare last and first
-                                          snapshots
+                                    lp  - compare last and previous snapshots
+                                    lf  - compare last and first snapshots
                                     n,m - compare snapshots with
                                           ordinals n (more recent)
                                           and m
@@ -80,12 +81,22 @@ Commands:
                                 from the compare report.
 
                 Example:
+#if WINDOWS
                     lschanged compare lp a,m,d C:\changed.txt -rp "C:\Starting Path" -i C:\Folder\.lschangedignore -s C:\Mystore
+#endif
+#if !WINDOWS
+                    lschanged compare lp a,m,d /path/to/changed.txt -rp /starting/path -i /path/to/ignore -s /path/to/store
+#endif
 
     list        Lists snapshots in the store.
 
                 Example:
+#if WINDOWS
                     lschanged list -s C:\Mystore
+#endif
+#if !WINDOWS
+                    lschanged list -s /path/to/store
+#endif
 
     delete      Deletes snapshot from the store.
 
@@ -94,8 +105,14 @@ Commands:
                                 'last' to delete the last snapshot.
 
                 Example:
+#if WINDOWS
                     lschanged delete 4 -s C:\Mystore
                     lschanged delete last -s C:\Mystore
+#endif
+#if !WINDOWS
+                    lschanged delete 4 -s /path/to/store
+                    lschanged delete last -s /path/to/store
+#endif
 
     clear       Clears the store.
 
@@ -103,7 +120,12 @@ Commands:
                     (none)
 
                 Example:
+#if WINDOWS
                     lschanged clear -s C:\Mystore
+#endif
+#if !WINDOWS
+                    lschanged clear -s /path/to/store
+#endif
 
     newignore  Creates a new ignore file in the specified path.
 
@@ -111,4 +133,9 @@ Commands:
                     path        The path to create ignore file. Must be
                                 an absolute path.
                 Example:
+#if WINDOWS
                     lschanged newignore "C:\Folder\.lschangedignore"
+#endif
+#if !WINDOWS
+                    lschanged newignore /path/to/.lschangedignore
+#endif

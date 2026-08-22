@@ -1,9 +1,10 @@
-﻿using LsChanged.Logging;
+﻿using lschanged.ProgramRunner;
+using LsChanged.Logging;
 using System.Reflection;
 
 namespace LsChanged.ProgramRunner;
 
-internal class HelpStrategy(ILogger logger) : IRunnerStrategy
+internal class HelpStrategy(ILogger logger, IHelpTextFilter helpTextFilter) : IRunnerStrategy
 {
     public int Run()
     {
@@ -23,7 +24,12 @@ internal class HelpStrategy(ILogger logger) : IRunnerStrategy
         using var reader = new StreamReader(stream);
 
         string content = reader.ReadToEnd();
-        logger.Info(content);
+        var lines = helpTextFilter.Filter(content);
+
+        foreach (string line in lines)
+        {
+            logger.Info(line);
+        }
 
         return ExitCode.HelpDisplayed;
     }
