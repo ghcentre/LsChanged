@@ -196,7 +196,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
             return lines;
         }
 
-        string root = _options.CompareRelativePath!;
+        string root = _options.CompareRelativePath;
         if (!Path.EndsInDirectorySeparator(root))
         {
             root += new string(Path.DirectorySeparatorChar, 1);
