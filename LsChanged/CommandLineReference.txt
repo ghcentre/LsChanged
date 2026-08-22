@@ -1,7 +1,7 @@
 ﻿Usage: lschanged command [args] [options]
 
     lschanged scan path [-fs mode] [-s path] [-v]
-    lschanged compare mode states listfile [-rp folder] [-s path] [-v]
+    lschanged compare mode states listfile [-rp folder] [-si ignorefile] [-s path] [-v]
     lschanged list [-s path] [-v]
     lschanged delete snapshot [-s path] [-v]
     lschanged clear [-s path] [-v]
@@ -11,7 +11,7 @@ Common options:
     -s path     Sets store path. The path must be absolute path.
 
     -v          Outputs actions perfomed to the standard output
-                (verbose mode). Error output is always directed to
+                (verbose mode). Error output is always directed to             
                 the standard error stream.
 
 Commands:
@@ -75,8 +75,12 @@ Commands:
                                 absolute path. The folder may not
                                 actually exist.
 
+                    -i ignorefile Specifies ignore file path. Ignore file
+                                contains rules to exclude file paths
+                                from the compare report.
+
                 Example:
-                    lschanged compare lp a,m,d C:\changed.txt -rp "C:\Starting Path" -s C:\Mystore
+                    lschanged compare lp a,m,d C:\changed.txt -rp "C:\Starting Path" -i C:\Folder\.lschangedignore -s C:\Mystore
 
     list        Lists snapshots in the store.
 
@@ -105,6 +109,6 @@ Commands:
 
                 Arguments:
                     path        The path to create ignore file. Must be
-                                absolute path.
+                                an absolute path.
                 Example:
                     lschanged newignore "C:\Folder\.lschangedignore"
