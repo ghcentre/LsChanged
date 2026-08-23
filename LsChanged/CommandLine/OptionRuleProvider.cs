@@ -47,6 +47,12 @@ internal class OptionRuleProvider
                 o.CompareRelativePath = a.First();
             }),
 
+        new("-i", 1,
+            (o, a) =>
+            {
+                o.IgnoreFilePath = a.First();
+            }),
+
 	    #endregion
 
         #region List

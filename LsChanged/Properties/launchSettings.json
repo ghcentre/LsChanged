@@ -2,15 +2,15 @@
   "profiles": {
     "Linux (WSL)": {
       "commandName": "WSL2",
-      "commandLineArgs": "{OutDir}/LsChanged.dll newignore /tmp/.lschangedignore"
+      "commandLineArgs": "{OutDir}/LsChanged.dll compare lp am /home/harder/lschanged-report.txt -s /home/harder/lschangedstore -i /home/harder/.lschangedignore"
     },
     "LsChanged scan": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore scan C:\\ -fs 1"
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore scan D:\\ -fs 1"
     },
     "LsChanged compare": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare lp am c:\\temp\\compare.txt -rp C:\\"
+      "commandLineArgs": "-s C:\\TEMP\\LsChangedStore compare lp am c:\\temp\\compare.txt -rp D:\\ -v"
     },
     "LsChanged list": {
       "commandName": "Project",

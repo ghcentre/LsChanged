@@ -19,9 +19,9 @@
 # 
 # Regex Options:
 # 
-#     i or I        Enables (i) or disables (I) case-insensitive matching.
-#                   By default, case-insensitive matching is disabled in Windows
-#                   and enabled in Linux.
+#     +i or -i      Enables (+i) or disables (-i) case-insensitive matching.
+#                   By default, case-insensitive matching is enabled in Windows
+#                   and disabled in Linux.
 #
 # To learn about regular expressions, refer to the documentation at
 # https://learn.microsoft.com/dotnet/standard/base-types/regular-expressions
@@ -44,6 +44,6 @@
 # Ignore all files in the logs directory (relative to the root specified in the -rp parameter):
 # regex=^logs/
 #
-# Ignore all files in the bin (Bin, BIN) and obj directories:
-# options=i regex=^(.*/)*(bin|obj)/
+# Ignore all files in the bin (Bin, BIN) and obj (Obj, OBJ) directories:
+# options=+i regex=^(.*/)*(bin|obj)/
 #

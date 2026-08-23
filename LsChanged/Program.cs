@@ -74,6 +74,8 @@ internal static class Program
         services.AddTransient<IStoreRecordReader, StoreRecordReader>();
         services.AddTransient<IStoreRecordWriter, StoreRecordWriter>();
         services.AddTransient<ICurrentTimeProvider, CurrentTimeProvider>();
+        services.AddTransient<IHelpTextFilter, HelpTextFilter>();
+        services.AddTransient<IIgnoreProcessor, IgnoreProcessor>();
 
         services.AddSingleton<IStore>(
             sp =>

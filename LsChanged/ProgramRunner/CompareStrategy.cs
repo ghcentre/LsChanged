@@ -15,6 +15,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
     private readonly ILogger _logger;
     private readonly CommandLineOptions _options;
     private readonly IStore _store;
+    private readonly IIgnoreProcessor _ignoreProcessor;
 
     private bool _includeAdded;
     private bool _includeModified;
@@ -26,11 +27,12 @@ internal sealed class CompareStrategy : IRunnerStrategy
     private int _numUnmodified;
     private int _numDeleted;
 
-    public CompareStrategy(ILogger logger, CommandLineOptions options, IStore store)
+    public CompareStrategy(ILogger logger, CommandLineOptions options, IStore store, IIgnoreProcessor ignoreProcessor)
     {
         _logger = logger;
         _options = options;
         _store = store;
+        _ignoreProcessor = ignoreProcessor;
 
         ConfigureIncludeSwitches(options);
     }
@@ -47,9 +49,11 @@ internal sealed class CompareStrategy : IRunnerStrategy
 
         var rootStripped = RemoveRootPrefix(compared);
 
-        SaveOutput(rootStripped);
+        var ignoreFiltered = _ignoreProcessor.FilterIgnored(rootStripped);
 
-        return rootStripped.Any() ? ExitCode.Success : ExitCode.NoFilesListed;
+        SaveOutput(ignoreFiltered);
+
+        return ignoreFiltered.Any() ? ExitCode.Success : ExitCode.NoFilesListed;
     }
 
     #region ctor helpers
@@ -65,7 +69,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
 
     #endregion
 
-    private (int, int?) GetSnapshotOrdinals(ICollection<IStoreEntry> entries)
+    private (int, int?) GetSnapshotOrdinals(List<IStoreEntry> entries)
     {
         if (entries.Count == 0)
         {
@@ -102,7 +106,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
         {
             var comparedWithEmpty = CompareWithEmptySnapshot(newSnapshot);
 
-            _logger.Debug("Compared snapshot #{0} with empty snapshot.", newOrdinal);
+            _logger.Debug("Compared snapshot #{0} with an empty snapshot.", newOrdinal);
             LogTotals();
 
             return comparedWithEmpty;

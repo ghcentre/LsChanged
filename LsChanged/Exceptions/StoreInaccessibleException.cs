@@ -1,8 +1,9 @@
 ﻿namespace LsChanged.Exceptions;
 
-internal class StoreInaccessibleException : Exception
+internal class StoreInaccessibleException(Exception innerException)
+    : FatalExitException(
+        $"The store is inaccessible: {innerException.Message}",
+        ProgramRunner.ExitCode.StoreUnaccessible,
+        innerException)
 {
-    public StoreInaccessibleException(Exception? innerException) : base(innerException?.Message, innerException)
-    {
-    }
 }

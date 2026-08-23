@@ -1,4 +1,4 @@
-﻿namespace lschanged.ProgramRunner;
+﻿namespace LsChanged.ProgramRunner;
 
 internal interface IHelpTextFilter
 {

@@ -1,4 +1,4 @@
-﻿namespace lschanged.ProgramRunner;
+﻿namespace LsChanged.ProgramRunner;
 
 internal sealed class HelpTextFilter : IHelpTextFilter
 {

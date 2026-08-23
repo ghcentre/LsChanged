@@ -1,4 +1,4 @@
-﻿using lschanged.ProgramRunner;
+﻿using LsChanged.ProgramRunner;
 using LsChanged.Logging;
 using System.Reflection;
 

@@ -52,7 +52,7 @@ internal class CommandLineOptions
 
     #endregion
 
-    #region NewIgnore
+    #region NewIgnore/Compare
 
     public string? IgnoreFilePath { get; set; } = default;
 
