@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="lschanged/lschanged.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/lschanged/lschanged.csproj" />
+  </Folder>
 </Solution>
