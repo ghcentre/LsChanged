@@ -18,7 +18,7 @@ internal class NewIgnoreStrategy(ILogger logger, CommandLineOptions options)
         }
 
         var assembly = Assembly.GetExecutingAssembly();
-        const string resourceName = "lschanged.IgnoreFile.txt";
+        const string resourceName = "LsChanged.IgnoreFile.txt";
 
         using var stream = assembly.GetManifestResourceStream(resourceName)
                            ?? throw new InvalidOperationException($"Could not find resource '{resourceName}'.");
