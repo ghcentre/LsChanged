@@ -88,6 +88,19 @@ Commands:
                     lschanged compare lp a,m,d /path/to/changed.txt -rp /starting/path -i /path/to/ignore -s /path/to/store
 #endif
 
+                The program exit code for compare command is:
+
+                    0           Comparison completed successfully
+                                and at least one path remains after
+                                filtering.
+
+                    1           No paths remain after filtering.
+                                The listfile is created but empty.
+
+                    (other)     An error occurred. The listfile is not
+                                created. The exact exit code is described
+                                in the Exit Codes section below.
+
     list        Lists snapshots in the store.
 
                 Example:
@@ -139,3 +152,15 @@ Commands:
 #if !WINDOWS
                     lschanged newignore /path/to/.lschangedignore
 #endif
+
+Exit Codes:
+    0           Success.
+    1           Comparison completed but no paths remained after filtering.
+    2           A snapshot was not found, or the store is empty for the requested operation.
+    3           The requested new ignore file already exists.
+    4           The ignore file does not exist.
+    5           The snapshot store cannot be accessed.
+    6           The ignore file contains invalid entries.
+    253         Invalid command-line syntax or argument.
+    254         Help was displayed.
+    255         Unexpected fatal error.
