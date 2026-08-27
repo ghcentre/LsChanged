@@ -2,7 +2,7 @@
 
 namespace LsChanged.CommandLine;
 
-internal class CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
+internal sealed class CommandLineParser(IEnumerable<OptionRule> rules, Action<CommandLineOptions> emptyCommandLine)
 {
     private readonly IReadOnlyDictionary<string, OptionRule> _rules = rules.ToDictionary(x => x.Prefix, x => x).AsReadOnly();
 

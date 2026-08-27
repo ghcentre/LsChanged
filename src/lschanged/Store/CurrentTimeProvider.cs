@@ -2,7 +2,7 @@
 
 namespace LsChanged.Store;
 
-internal class CurrentTimeProvider : ICurrentTimeProvider
+internal sealed class CurrentTimeProvider : ICurrentTimeProvider
 {
     public DateTime CurrentTime => DateTime.UtcNow;
 }

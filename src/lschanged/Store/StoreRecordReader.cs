@@ -4,7 +4,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 
-internal class StoreRecordReader : IStoreRecordReader
+internal sealed class StoreRecordReader : IStoreRecordReader
 {
     private const string _gzipExtension = ".gz";
 

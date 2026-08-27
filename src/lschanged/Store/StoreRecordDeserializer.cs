@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace LsChanged.Store;
 
-internal class StoreRecordDeserializer : IStoreRecordDeserializer
+internal sealed class StoreRecordDeserializer : IStoreRecordDeserializer
 {
     public IStoreRecord Deserialize(byte[] serialized)
     {

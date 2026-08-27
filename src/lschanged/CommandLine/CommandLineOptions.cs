@@ -4,7 +4,7 @@ using LsChanged.Exceptions;
 
 namespace LsChanged.CommandLine;
 
-internal class CommandLineOptions
+internal sealed class CommandLineOptions
 {
     public bool Verbose { get; set; } = false;
 

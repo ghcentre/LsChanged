@@ -5,7 +5,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.ProgramRunner;
 
-internal class DeleteStrategy(ILogger logger, CommandLineOptions options, IStore store) : IRunnerStrategy
+internal sealed class DeleteStrategy(ILogger logger, CommandLineOptions options, IStore store) : IRunnerStrategy
 {
     public int Run()
     {

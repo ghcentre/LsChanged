@@ -4,7 +4,7 @@ using LsChanged.Exceptions;
 
 namespace LsChanged.CommandLine;
 
-internal class OptionRuleProvider
+internal static class OptionRuleProvider
 {
     private static readonly OptionRule[] _rules =
     [

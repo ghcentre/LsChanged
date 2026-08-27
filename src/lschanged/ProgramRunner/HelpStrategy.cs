@@ -1,10 +1,9 @@
-﻿using LsChanged.ProgramRunner;
-using LsChanged.Logging;
+﻿using LsChanged.Logging;
 using System.Reflection;
 
 namespace LsChanged.ProgramRunner;
 
-internal class HelpStrategy(ILogger logger, IHelpTextFilter helpTextFilter) : IRunnerStrategy
+internal sealed class HelpStrategy(ILogger logger, IHelpTextFilter helpTextFilter) : IRunnerStrategy
 {
     public int Run()
     {

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LsChanged.ProgramRunner;
 
-internal class NewIgnoreStrategy(ILogger logger, CommandLineOptions options)
+internal sealed class NewIgnoreStrategy(ILogger logger, CommandLineOptions options)
     : IRunnerStrategy
 {
     public int Run()

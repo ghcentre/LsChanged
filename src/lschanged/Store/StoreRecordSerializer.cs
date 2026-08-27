@@ -8,7 +8,7 @@ using System.Text.Unicode;
 
 namespace LsChanged.Store;
 
-internal class StoreRecordSerializer : IStoreRecordSerializer
+internal sealed class StoreRecordSerializer : IStoreRecordSerializer
 {
     private static readonly JsonSerializerOptions _serializerOptions = new()
     {

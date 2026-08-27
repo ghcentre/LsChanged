@@ -3,7 +3,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 
-internal class StoreRecord : IStoreRecord
+internal sealed class StoreRecord : IStoreRecord
 {
     private const int _version1 = 1;
 

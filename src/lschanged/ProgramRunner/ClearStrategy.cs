@@ -3,7 +3,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.ProgramRunner;
 
-internal class ClearStrategy(ILogger logger, IStore store) : IRunnerStrategy
+internal sealed class ClearStrategy(ILogger logger, IStore store) : IRunnerStrategy
 {
     public int Run()
     {

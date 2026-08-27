@@ -4,11 +4,11 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.ProgramRunner;
 
-internal class ScanStrategy(CommandLineOptions options,
-                            IStore store,
-                            Func<CommandLineOptions, IFileInfoCollector> collectorFactory,
-                            IStoreRecordFactory storeRecordFactory,
-                            ICurrentTimeProvider currentTimeProvider)
+internal sealed class ScanStrategy(CommandLineOptions options,
+                                   IStore store,
+                                   Func<CommandLineOptions, IFileInfoCollector> collectorFactory,
+                                   IStoreRecordFactory storeRecordFactory,
+                                   ICurrentTimeProvider currentTimeProvider)
     : IRunnerStrategy
 {
     public int Run()

@@ -1,6 +1,6 @@
 ﻿namespace LsChanged.Exceptions;
 
-internal class StoreEntrySerializationException : Exception
+internal sealed class StoreEntrySerializationException : Exception
 {
     public StoreEntrySerializationException(string? message) : base(message)
     {

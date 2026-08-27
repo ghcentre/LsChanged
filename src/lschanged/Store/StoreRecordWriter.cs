@@ -1,10 +1,9 @@
-﻿using System.IO.Compression;
-using System.Text;
-using LsChanged.Store.Abstractions;
+﻿using LsChanged.Store.Abstractions;
+using System.IO.Compression;
 
 namespace LsChanged.Store;
 
-internal class StoreRecordWriter : IStoreRecordWriter
+internal sealed class StoreRecordWriter : IStoreRecordWriter
 {
     private const string _gzipExtension = ".gz";
 

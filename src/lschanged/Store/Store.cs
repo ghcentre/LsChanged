@@ -3,7 +3,7 @@ using LsChanged.Store.Abstractions;
 
 namespace LsChanged.Store;
 
-internal class Store : IStore
+internal sealed class Store : IStore
 {
     private const string _markerFileName = ".lschanged.store.marker";
 

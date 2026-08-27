@@ -2,7 +2,7 @@
 
 namespace LsChanged.Logging;
 
-internal class LoggerFactory(Func<CommandLineOptions> commandLineOptionsFactory) : ILoggerFactory
+internal sealed class LoggerFactory(Func<CommandLineOptions> commandLineOptionsFactory) : ILoggerFactory
 {
     public ILogger CreateLogger()
     {

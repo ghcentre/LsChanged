@@ -1,6 +1,6 @@
 ﻿namespace LsChanged.Logging;
 
-internal class ConsoleLogger(bool verbose) : ILogger
+internal sealed class ConsoleLogger(bool verbose) : ILogger
 {
     private enum LogLevel
     {

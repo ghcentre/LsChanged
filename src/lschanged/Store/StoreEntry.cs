@@ -2,7 +2,7 @@
 
 namespace LsChanged.Store;
 
-internal class StoreEntry : IStoreEntry
+internal sealed class StoreEntry : IStoreEntry
 {
     public StoreEntry(string id)
     {
