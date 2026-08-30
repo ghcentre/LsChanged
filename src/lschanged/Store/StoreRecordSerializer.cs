@@ -4,18 +4,17 @@ using LsChanged.Store.Serialization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace LsChanged.Store;
 
 internal sealed class StoreRecordSerializer : IStoreRecordSerializer
 {
-    private static readonly JsonSerializerOptions _serializerOptions = new()
-    {
-        TypeInfoResolver = StoreRecordSerializerContext.Default,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-        WriteIndented = true
-    };
+    private static readonly JsonSerializerOptions _serializerOptions =
+        new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            WriteIndented = true
+        };
 
     public byte[] Serialize(IStoreRecord storeRecord)
     {
@@ -26,8 +25,9 @@ internal sealed class StoreRecordSerializer : IStoreRecordSerializer
             throw new StoreEntrySerializationException("Unsupported Store Record implementation.");
         }
 
-        string resultString = JsonSerializer.Serialize(recordImpl, typeof(StoreRecord), _serializerOptions);
-        
+        var context = new StoreRecordSerializerContext(_serializerOptions);
+        string resultString = JsonSerializer.Serialize(recordImpl, context.StoreRecord);
+
         byte[] result = Encoding.UTF8.GetBytes(resultString);
         return result;
     }
