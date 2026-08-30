@@ -97,7 +97,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
         return (newOrdinal, oldOrdinal);
     }
 
-    private IEnumerable<string> CompareSnapshotsByOrdinals(int newOrdinal, int? oldOrdinal)
+    private List<string> CompareSnapshotsByOrdinals(int newOrdinal, int? oldOrdinal)
     {
         var newSnapshot = _store.GetByOrdinal(newOrdinal)
                           ?? throw new SnapshotNotFoundException(newOrdinal);
@@ -125,7 +125,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
     
     #region Compare
     
-    private IEnumerable<string> CompareWithEmptySnapshot(IStoreRecord newSnapshot)
+    private List<string> CompareWithEmptySnapshot(IStoreRecord newSnapshot)
     {
         var paths = _includeAdded
             ? newSnapshot.Files.Keys
@@ -139,12 +139,13 @@ internal sealed class CompareStrategy : IRunnerStrategy
         return result;
     }
 
-    private IEnumerable<string> Compare(IStoreRecord newSnapshot, IStoreRecord oldSnapshot)
+    private List<string> Compare(IStoreRecord newSnapshot, IStoreRecord oldSnapshot)
     {
         var oldSnapFiles = oldSnapshot.Files.ToDictionary(x => x.Key, x => new SeenState(x.Value, false));
         var newSnapFiles = newSnapshot.Files;
 
-        var result = new List<string>();
+        int maxElements= Math.Max(oldSnapFiles.Count, newSnapFiles.Count);
+        var result = new List<string>(maxElements);
 
         static void doNothing(string x) { }
 
@@ -207,7 +208,7 @@ internal sealed class CompareStrategy : IRunnerStrategy
         }
         int rootLength = root.Length;
 
-        var result = lines.Select(x => x.StartsWith(root, StringComparison.Ordinal) ? x.Substring(rootLength) : x);
+        var result = lines.Select(x => x.StartsWith(root, StringComparison.Ordinal) ? x[rootLength..] : x);
         return result;
     }
 

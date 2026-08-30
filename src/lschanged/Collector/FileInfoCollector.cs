@@ -5,8 +5,9 @@ namespace LsChanged.Collector;
 
 internal sealed class FileInfoCollector(ILogger logger, FollowSymlinksMode followSymlinksMode) : IFileInfoCollector
 {
-    private readonly Dictionary<string, FileStatus> _files = [];
-    private readonly HashSet<string> _visitedDirectories = [];
+    private const int _initialCapacity = 1024;
+    private readonly Dictionary<string, FileStatus> _files = new(_initialCapacity);
+    private readonly HashSet<string> _visitedDirectories = new(_initialCapacity);
 
     private int _totalFiles;
     private int _totalDirectories;
