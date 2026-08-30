@@ -101,6 +101,10 @@ Commands:
                                 created. The exact exit code is described
                                 in the Exit Codes section below.
 
+                Please note that the exit code 1 is not an error.
+                It is a valid exit code for the compare command, when
+                no paths remain after filtering.
+
     list        Lists snapshots in the store.
 
                 Example:
