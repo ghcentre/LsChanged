@@ -1,7 +1,15 @@
 setlocal enableextensions enabledelayedexpansion
 
 pushd ..\src\lschanged
+call :buildall
+popd
+pushd ..\src\copyfiles
+call :buildall
+popd
 
+endlocal & exit /b 0
+
+:buildall
 dotnet publish -c Release ^
                -o ..\..\releases\win-x64 ^
                --self-contained ^
@@ -41,7 +49,3 @@ dotnet publish -c Release ^
                -p:PublishTrimmed=true ^
                -p:PublishSingleFile=true ^
                -p:InvariantGlobalization=true
-
-popd             
-
-endlocal & exit /b 0

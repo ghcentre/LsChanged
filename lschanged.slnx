@@ -3,6 +3,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/copyfiles/copyfiles.csproj" Id="5d64535e-db6c-47fb-834e-6a7a72bf3337" />
     <Project Path="src/lschanged/lschanged.csproj" />
   </Folder>
 </Solution>
